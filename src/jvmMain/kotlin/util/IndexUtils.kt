@@ -1,4 +1,4 @@
-package day01.util
+package util
 
 fun String.indexOfOrNull(value: String): Int? {
     val index = indexOf(value)

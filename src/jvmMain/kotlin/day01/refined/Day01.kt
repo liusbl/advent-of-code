@@ -1,6 +1,6 @@
 package day01.refined
 
-import day01.util.indexOfOrNull
+import util.indexOfOrNull
 import java.io.File
 
 fun main() {
