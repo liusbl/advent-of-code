@@ -38,8 +38,8 @@ val wordNumbers = mapOf(
 val allNumbers = (wordNumbers.keys + wordNumbers.values.map { it.toString() }).toList()
 val allNumbersReversed = allNumbers.map { it.reversed() } // eno, owt, eerht, etc...
 
-fun String.firstOfAny(possibilities: List<String>): String =
-    possibilities.minBy { number ->
+fun String.firstOfAny(values: List<String>): String =
+    values.minBy { number ->
         val index = indexOf(number)
         if (index == -1) Int.MAX_VALUE else index
     }
