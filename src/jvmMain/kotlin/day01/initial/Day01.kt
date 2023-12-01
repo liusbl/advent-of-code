@@ -3,7 +3,7 @@ package day01.initial
 
 // Took 48 minutes to solve
 fun main() {
-//    day1part1()
+//    day1part1() // Solution: 55816
     day1part2() // Solution: 54980
 }
 
