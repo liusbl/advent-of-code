@@ -1,6 +1,5 @@
 package day01.refined
 
-import util.indexOfOrNull
 import java.io.File
 
 fun main() {
@@ -40,13 +39,9 @@ val allNumbers = (wordNumbers.keys + wordNumbers.values.map { it.toString() }).t
 val allNumbersReversed = allNumbers.map { it.reversed() } // eno, owt, eerht, etc...
 
 fun String.firstOfAny(possibilities: List<String>): String =
-    possibilities.mapNotNull { number ->
-        val index = indexOfOrNull(number)
-        if (index == null) {
-            return@mapNotNull null
-        } else {
-            number to index
-        }
-    }.minBy { it.second }.first
+    possibilities.minBy { number ->
+        val index = indexOf(number)
+        if (index == -1) Int.MAX_VALUE else index
+    }
 
-fun String.convertToDigit(): Int = if (this[0].isDigit()) toInt() else wordNumbers[this]!!.toInt()
+fun String.convertToDigit(): Int = if (this[0].isDigit()) this.toInt() else wordNumbers[this]!!.toInt()
