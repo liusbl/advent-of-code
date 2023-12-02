@@ -6,13 +6,25 @@ fun main() {
     solvePart1() // Solution:
 }
 
+// max amount of: 12 red cubes, 13 green cubes, and 14 blue cubes
 fun solvePart1() {
-    val input = File("src/jvmMain/kotlin/day02/input/input_part1_test.txt")
+    val input = File("src/jvmMain/kotlin/day02/input/input.txt")
+//    val input = File("src/jvmMain/kotlin/day02/input/input_part1_test.txt")
     val lines = input.readLines()
 
-    val game = lines.map(::Game)
+    val gameList = lines.map(::Game)
 
-    println(game)
+    val result = gameList.filter { game ->
+        val cubeDrawList = game.list
+        cubeDrawList.all {
+            val redCubeCount = it.list.firstOrNull { it.color == Color.Red }?.count ?: 0
+            val greenCubeCount = it.list.firstOrNull { it.color == Color.Green }?.count ?: 0
+            val blueCubeCount = it.list.firstOrNull { it.color == Color.Blue }?.count ?: 0
+            redCubeCount <= 12 && greenCubeCount <= 13 && blueCubeCount <= 14
+        }
+    }.sumOf { it.id }
+
+    println(result)
 }
 
 // Solving
@@ -24,7 +36,7 @@ fun Game(line: String): Game {
         .split(";")
         .map(::CubeDraw)
     val id = split[0].split(" ")[1].toInt()
-    return Game(id = id,list = cubeDraw)
+    return Game(id = id, list = cubeDraw)
 }
 
 // 3 blue, 4 red
