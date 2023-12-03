@@ -17,3 +17,5 @@ fun <T> List<T>.indexOfOrNull(value: T): Int? {
         index
     }
 }
+
+fun <T> List<T>.set(index: Int, value: T): List<T> = toMutableList().apply { set(index, value) }
