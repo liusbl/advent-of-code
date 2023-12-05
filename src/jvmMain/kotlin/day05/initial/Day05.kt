@@ -29,7 +29,7 @@ fun solvePart1() {
 
             val category = Category(last.list.add(map))
 
-            acc.setLast(category)
+            acc.updateLast(category)
         }
     }
 
@@ -45,6 +45,12 @@ fun solvePart1() {
     println("min: $min")
 }
 
+fun thing(category: Category, seed: Long): Pair<Boolean, Long>  {
+    val firstNextSeed = category.list.find { it.contains(seed) }?.next(seed) ?: seed
+    val firstKeyPoints = category.list.map { it.source to it.source + it.length }
+    return firstKeyPoints.any { it.first == seed || it.second == seed } to firstNextSeed
+}
+
 fun solvePart2() {
     val input = File("src/jvmMain/kotlin/day05/input/input_part1_test.txt")
 //    val input = File("src/jvmMain/kotlin/day05/input/input.txt")
@@ -55,7 +61,7 @@ fun solvePart2() {
         if (index % 2 == 0) {
             acc.add(Seed(number = next, length = 0))
         } else {
-            acc.setLast(acc.last().copy(length = next))
+            acc.updateLast { copy(length = next) }
         }
     }
 
@@ -77,51 +83,159 @@ fun solvePart2() {
 
             val category = Category(last.list.add(map))
 
-            acc.setLast(category)
+            acc.updateLast(category)
         }
     }.map { category -> category.copy(list = category.list.sortedBy { map -> map.source }) }
 
-    val keyPoints = categoryList.map { it.list.map { it.source } }
-    println("Key points: ${keyPoints.take(2)}")
+//    val keyPoints = categoryList.map { it.list.map { it.source } }
+//    println("Key points: ${keyPoints.take(2)}")
 
-    println(categoryList.joinToString("\n"))
+    println(categoryList.take(2).joinToString("\n"))
 
-    val min = (0..100L).minOfOrNull { seed ->
-        val categorySubList = categoryList.take(1)
-        val categoryKeyPoints = categorySubList.map { it.list.map { it.source } }.flatten()
-        val res = categorySubList.fold(seed) { acc, category ->
-            category.list.find { it.contains(acc) }?.next(acc) ?: acc
-        }
+    /***** Experiments *////
 
-        val categorySubList2 = listOf(categoryList[1])
-        val categoryKeyPoints2 = categorySubList2.map { it.list.map { it.source } }.flatten()
-        val res2 = categorySubList2.fold(res) { acc, category ->
-            category.list.find { it.contains(acc) }?.next(acc) ?: acc
-        }
 
-        if (categoryKeyPoints.contains(seed) && categoryKeyPoints2.contains(seed)) {
-            println("$seed to $res to $res2 <-- key point from list 1 AND list 2")
-        } else if (categoryKeyPoints.contains(seed)) {
-            println("$seed to $res to $res2 <-- key point from list 1")
-        } else if (categoryKeyPoints2.contains(seed)) {
-            println("$seed to $res to $res2 <-- key point from list 2")
-        } else {
-            println("$seed to $res to $res2")
-        }
+    /**
+     * Experiment 4
+     */
+    val listOfSeedsToCheck = listOf(82L).filter { seed ->
+//    val listOfSeedsToCheck = (79..92L).filter { seed ->
+        val category0 = categoryList[0]
+        val (contains1, seed1) = thing(category0, seed)
 
-        res
+        val category1 = categoryList[1]
+        val (contains2, seed2) = thing(category1, seed1)
+
+        val category2 = categoryList[2]
+        val (contains3, seed3) = thing(category2, seed2)
+
+        val category3 = categoryList[3]
+        val (contains4, seed4) = thing(category3, seed3)
+
+        val category4 = categoryList[4]
+        val (contains5, seed5) = thing(category4, seed4)
+
+        val category5 = categoryList[5]
+        val (contains6, seed6) = thing(category5, seed5)
+
+        val category6 = categoryList[6]
+        val (contains7, seed7) = thing(category6, seed6)
+        println(category6)
+
+        println("$seed -> $seed1 -> $seed2 -> $seed3 -> $seed4 -> $seed5 -> $seed6 -> $seed7")
+        println("$contains1 $contains2 $contains3 $contains4 $contains5 $contains6 $contains7")
+        println()
+        true
     }
 
-//    val min = seeds.minOfOrNull { seed ->
-//        val res = categoryList.fold(seed) { acc, category ->
-//            category.list.find { it.contains(acc) }?.next(acc) ?: acc
-//        }
-//        println(res)
+    println(listOfSeedsToCheck)
+
+
+    /**
+     * Experiment 3
+     */
+//    val endSeed = 100L
+
+
+//    val firstCategory = categoryList[0]
+//    val firstKeyPoints = firstCategory.list.map { it.source to it.source + it.length }
+//
+//    val secondCategory = categoryList[1]
+////    val secondKeyPoints = secondCategory.list.map { it.source to it.source + it.length }
+//
+//    var startSeed = 0L
+//
+//    while (startSeed <= endSeed) {
+//        val firstNextSeed = firstCategory.list.find { it.contains(startSeed) }?.next(startSeed) ?: startSeed
+//        val secondNextSeed = secondCategory.list.find { it.contains(firstNextSeed) }?.next(firstNextSeed) ?: firstNextSeed
+//
+//        println("startSeed: ${startSeed}")
+//        println(
+//            "firstCategory: ${firstCategory}\n" +
+//                    "firstNextSeed: ${firstNextSeed}\n" +
+//                    "firstKeyPoints: ${firstKeyPoints}\n" +
+//                    "mapping: $startSeed to $firstNextSeed to $secondNextSeed"
+//        )
 //        println()
-//        res
+//        println(
+//            "secondCategory: ${secondCategory}\n" +
+//                    "secondNextSeed: ${secondNextSeed}\n" +
+//                    "secondKeyPoints: ${secondKeyPoints}\n"
+//        )
+//        println("==================")
+//
+//        startSeed = firstKeyPoints.find { it.first > startSeed }?.first!!
 //    }
 
-//    println("min: $min")
+    /**
+     * Experiment 2
+     */
+
+//    val endSeed = 100L
+//
+//    val firstCategory = categoryList[0]
+//    val firstKeyPoints = firstCategory.list.map { it.source to it.source + it.length }
+//
+//    val secondCategory = categoryList[1]
+//    val secondKeyPoints = secondCategory.list.map { it.source to it.source + it.length }
+//
+//    var startSeed = 0L
+//
+//    while (startSeed <= endSeed) {
+//        val firstNextSeed = firstCategory.list.find { it.contains(startSeed) }?.next(startSeed) ?: startSeed
+//        val secondNextSeed = secondCategory.list.find { it.contains(firstNextSeed) }?.next(firstNextSeed) ?: firstNextSeed
+//
+//        println("startSeed: ${startSeed}")
+//        println(
+//            "firstCategory: ${firstCategory}\n" +
+//                    "firstNextSeed: ${firstNextSeed}\n" +
+//                    "firstKeyPoints: ${firstKeyPoints}\n" +
+//                    "mapping: $startSeed to $firstNextSeed to $secondNextSeed"
+//        )
+//        println()
+//        println(
+//            "secondCategory: ${secondCategory}\n" +
+//                    "secondNextSeed: ${secondNextSeed}\n" +
+//                    "secondKeyPoints: ${secondKeyPoints}\n"
+//        )
+//        println("==================")
+//
+//        startSeed = firstKeyPoints.find { it.first > startSeed }?.first!!
+
+//    /**
+//     * Experiment 1
+//     */
+//    val listOfSeedsToCheck = (0..100L).filter { seed ->
+//        val firstCategory = categoryList[0]
+//        val firstNextSeed = firstCategory.list.find { it.contains(seed) }?.next(seed) ?: seed
+//        val firstKeyPoints = firstCategory.list.map { it.source }
+//        val firstEndPoints = firstCategory.list.map { it.source + it.length }
+//
+//        val secondCategory = categoryList[1]
+//        val secondNextSeed = secondCategory.list.find { it.contains(firstNextSeed) }?.next(firstNextSeed)
+//            ?: firstNextSeed
+//        val secondKeyPoints = secondCategory.list.map { it.source }
+//        val secondEndPoints = secondCategory.list.map { it.source + it.length }
+//
+//        println(
+//            "$seed to $firstNextSeed to $secondNextSeed. " +
+//                    "In List 1: ${firstKeyPoints.contains(seed).display()}. " +
+//                    "In List 2: ${secondKeyPoints.contains(firstNextSeed).display()}. " +
+//                    "In Endpoint 1: ${firstEndPoints.contains(seed).display()}. " +
+//                    "In Endpoint 2: ${secondEndPoints.contains(firstNextSeed).display()}. "
+//        )
+//        firstKeyPoints.contains(seed) ||
+//            secondKeyPoints.contains(firstNextSeed) ||
+//            firstEndPoints.contains(seed) ||
+//            secondEndPoints.contains(firstNextSeed)
+//    }
+//
+//    println(listOfSeedsToCheck)
+
+}
+
+fun Boolean.display(): String {
+    return if (this) "_TRUE" else "false"
 }
 
 // Is there a way to combine categories so that I that instead of seed-to-soil to soil-to-fertilizer
@@ -178,9 +292,14 @@ fun keyNumbersToCheck() {
      */
 }
 
-fun <T> List<T>.setLast(value: T): List<T> {
+fun <T> List<T>.updateLast(value: T): List<T> {
     return this.dropLast(1) + listOf(value)
 }
+
+fun <T> List<T>.updateLast(update: T.() -> T): List<T> {
+    return updateLast(update(this.last()))
+}
+
 
 fun <T> List<T>.add(value: T): List<T> {
     return this + listOf(value)
@@ -211,7 +330,7 @@ data class Map(
     val length: Long
 ) {
     fun contains(seed: Long): Boolean {
-        return seed >= source && seed <= source + length
+        return seed >= source && seed <= source + length - 1
     }
 
     fun next(seed: Long): Long =
