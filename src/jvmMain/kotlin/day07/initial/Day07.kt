@@ -1,4 +1,4 @@
-package dayNN.initial
+package day07.initial
 
 import java.io.File
 
@@ -7,7 +7,7 @@ fun main() {
 }
 
 fun solvePart1() {
-    val input = File("src/jvmMain/kotlin/dayNN/input/input_part1_test.txt")
+    val input = File("src/jvmMain/kotlin/day07/input/input.txt")
     val lines = input.readLines()
 
     val result = "result"
