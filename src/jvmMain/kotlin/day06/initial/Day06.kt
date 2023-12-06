@@ -41,6 +41,7 @@ h = (t - sqrt(t^2 - 4f))/2
  */
 fun main() {
     solvePart1() // Solution: 131376, finished 14:08
+//    solvePart2() // Solution: 34123437, finished 14:10
 }
 
 fun solve(time: Long, record: Long): Long {
@@ -82,7 +83,8 @@ fun solve(time: Long, record: Long): Long {
 // 131376 is correct
 fun solvePart1() {
 //    val input = File("src/jvmMain/kotlin/day06/input/input_part1_test.txt")
-    val input = File("src/jvmMain/kotlin/day06/input/input.txt")
+//    val input = File("src/jvmMain/kotlin/day06/input/input.txt")
+    val input = File("src/jvmMain/kotlin/day06/input/input_part2.txt")
     val (timeText, recordText) = input.readLines()
     val times = timeText.split(" ").filter { it.isNotBlank() }.map { it.toLong() }
     val records = recordText.split(" ").filter { it.isNotBlank() }.map { it.toLong() }
