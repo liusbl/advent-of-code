@@ -3,7 +3,7 @@ package day07.initial
 import java.io.File
 
 fun main() {
-    solvePart1() // Solution:
+    solvePart1() // Solution: 253910319, time: 08:02
 }
 
 // 254046151 is not right answer
@@ -24,6 +24,7 @@ fun solvePart1() {
     }
 
     println(message.joinToString("\n"))
+    println(handList.mapIndexed { index, hand -> hand.bid * (index + 1)}.sum())
 }
 
 
@@ -84,7 +85,8 @@ enum class Type(val rule: (hand: Hand) -> Boolean) {
         hand.list.distinct().size == 2 &&
                 hand.list.sortedBy { it.char }.windowed(3).any { it.distinct().size == 1 }
     }),
-    FourOfAKind({ hand -> hand.list.distinct().size == 2 }),
+    FourOfAKind({ hand -> hand.list.distinct().size == 2 &&
+            hand.list.sortedBy { it.char }.windowed(4).any { it.distinct().size == 1 }}),
     FiveOfAKind({ hand -> hand.list.distinct().size == 1 });
 }
 
