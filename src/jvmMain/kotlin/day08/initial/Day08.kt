@@ -3,7 +3,7 @@ package day08.initial
 import java.io.File
 
 fun main() {
-    solvePart1() // Solution:
+    solvePart1() // Solution: 19637, Time: 20:30
 }
 
 fun solvePart1() {
@@ -14,7 +14,7 @@ fun solvePart1() {
     val directionList = lines[0].trim().map(::Direction)
     val nodeList = lines.subList(2, lines.size).map(::Node)
 
-    var currentNode = nodeList[0]
+    var currentNode = nodeList.first { it.name == "AAA" }
     var directionIndex = 0
     var count = 0
     while (!currentNode.final) {
@@ -51,8 +51,7 @@ data class Node(
     val leftName: String,
     val rightName: String
 ) {
-//    val final: Boolean = name == "ZZZ"
-    val final: Boolean = name == "SKN"
+    val final: Boolean = name == "ZZZ"
 }
 
 fun Direction(char: Char): Direction = when (char) {
