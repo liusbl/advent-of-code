@@ -1,5 +1,7 @@
 package day05.initial
 
+import util.add
+import util.updateLast
 import java.io.File
 
 fun main() {
@@ -388,19 +390,6 @@ fun Boolean.display(): String {
 // Is there a way to combine categories so that I that instead of seed-to-soil to soil-to-fertilizer
 //      we could directly do seed-to-fertilizer??
 fun keyNumbersToCheck() {
-}
-
-fun <T> List<T>.updateLast(value: T): List<T> {
-    return this.dropLast(1) + listOf(value)
-}
-
-fun <T> List<T>.updateLast(update: T.() -> T): List<T> {
-    return updateLast(update(this.last()))
-}
-
-
-fun <T> List<T>.add(value: T): List<T> {
-    return this + listOf(value)
 }
 
 data class Category(
