@@ -24,16 +24,31 @@ fun solvePart1() {
     println(expandedGrid.toPrintableString(includeLocation = true))
     println()
 
-    println("Pair list:")
     val pairList = expandedGrid.getPairList()
-    println(pairList.joinToString("\n"))
-    println(pairList.size)
+    println("Pair list. Size: ${pairList.size}. Content:")
+    println(pairList.joinToString("\n")/* { (first, second) -> "$first, $second, distance: ${first.taxicabDistance(second)}" }*/)
     println()
+
+    val distanceSum = pairList.sumOf { it.distance }
+    println("Distance sum: $distanceSum")
 }
 
-fun Grid<Image>.getPairList(): List<Pair<Location<Image>, Location<Image>>> {
+data class GalaxyPair(
+    val first: Location<Image>,
+    val second: Location<Image>,
+    val distance: Int
+)
+
+fun GalaxyPair(pair: Pair<Location<Image>, Location<Image>>): GalaxyPair =
+    GalaxyPair(
+        first = pair.first,
+        second = pair.second,
+        distance = pair.first.taxicabDistance(pair.second)
+    )
+
+fun Grid<Image>.getPairList(): List<GalaxyPair> {
     val galaxyList = this.rowList.flatten().filter { it.value is Galaxy }
-    return galaxyList.fold(listOf()) { acc, firstGalaxy ->
+    return galaxyList.fold(emptyList<Pair<Location<Image>, Location<Image>>>()) { acc, firstGalaxy ->
         acc + galaxyList.flatMap { secondGalaxy ->
             if (firstGalaxy == secondGalaxy || acc.contains(firstGalaxy to secondGalaxy) || acc.contains(secondGalaxy to firstGalaxy)) {
                 listOf(null)
@@ -41,7 +56,7 @@ fun Grid<Image>.getPairList(): List<Pair<Location<Image>, Location<Image>>> {
                 listOf(firstGalaxy to secondGalaxy)
             }
         }.filterNotNull()
-    }
+    }.map(::GalaxyPair)
 }
 
 fun Grid<Image>.expandSpace(): Grid<Image> {
