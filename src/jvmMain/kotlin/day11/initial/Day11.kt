@@ -24,7 +24,24 @@ fun solvePart1() {
     println(expandedGrid.toPrintableString(includeLocation = true))
     println()
 
+    println("Pair list:")
+    val pairList = expandedGrid.getPairList()
+    println(pairList.joinToString("\n"))
+    println(pairList.size)
     println()
+}
+
+fun Grid<Image>.getPairList(): List<Pair<Location<Image>, Location<Image>>> {
+    val galaxyList = this.rowList.flatten().filter { it.value is Galaxy }
+    return galaxyList.fold(listOf()) { acc, firstGalaxy ->
+        acc + galaxyList.flatMap { secondGalaxy ->
+            if (firstGalaxy == secondGalaxy || acc.contains(firstGalaxy to secondGalaxy) || acc.contains(secondGalaxy to firstGalaxy)) {
+                listOf(null)
+            } else {
+                listOf(firstGalaxy to secondGalaxy)
+            }
+        }.filterNotNull()
+    }
 }
 
 fun Grid<Image>.expandSpace(): Grid<Image> {
@@ -38,15 +55,16 @@ fun Grid<Image>.expandSpace(): Grid<Image> {
         }
     }.first.flatten().let(::Grid)
 
-    val expandedColumnGrid = expandedRowGrid.columnList.fold(listOf(emptyList<Location<Image>>()) to 0) { (acc, additional), column ->
-        val newColumn = column.map { it.copy(column = it.column + additional) }
-        if (newColumn.all { it.value == Space }) {
-            val newUpdatedColumn = column.map { it.copy(column = it.column + additional + 1) }
-            acc.add(newColumn).add(newUpdatedColumn) to additional + 1
-        } else {
-            acc.add(newColumn) to additional
-        }
-    }.first.flatten().let(::Grid)
+    val expandedColumnGrid =
+        expandedRowGrid.columnList.fold(listOf(emptyList<Location<Image>>()) to 0) { (acc, additional), column ->
+            val newColumn = column.map { it.copy(column = it.column + additional) }
+            if (newColumn.all { it.value == Space }) {
+                val newUpdatedColumn = column.map { it.copy(column = it.column + additional + 1) }
+                acc.add(newColumn).add(newUpdatedColumn) to additional + 1
+            } else {
+                acc.add(newColumn) to additional
+            }
+        }.first.flatten().let(::Grid)
     return expandedColumnGrid
 }
 
