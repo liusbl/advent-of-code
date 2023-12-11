@@ -6,11 +6,12 @@ import util.add
 import java.io.File
 
 fun main() {
-    solvePart1() // Solution:
+    solvePart1() // Solution: 9565386, time 13:50
 }
 
 fun solvePart1() {
-    val input = File("src/jvmMain/kotlin/day11/input/input_part1_test.txt")
+//    val input = File("src/jvmMain/kotlin/day11/input/input_part1_test.txt")
+    val input = File("src/jvmMain/kotlin/day11/input/input.txt")
     val grid = Grid(input.readLines())
 
     println("Initial grid:")
@@ -46,9 +47,11 @@ fun GalaxyPair(pair: Pair<Location<Image>, Location<Image>>): GalaxyPair =
         distance = pair.first.taxicabDistance(pair.second)
     )
 
+// FIXME Very inefficient
 fun Grid<Image>.getPairList(): List<GalaxyPair> {
     val galaxyList = this.rowList.flatten().filter { it.value is Galaxy }
-    return galaxyList.fold(emptyList<Pair<Location<Image>, Location<Image>>>()) { acc, firstGalaxy ->
+    return galaxyList.foldIndexed(emptyList<Pair<Location<Image>, Location<Image>>>()) { index, acc, firstGalaxy ->
+        println("Handling pair index: $index, of ${galaxyList.size}")
         acc + galaxyList.flatMap { secondGalaxy ->
             if (firstGalaxy == secondGalaxy || acc.contains(firstGalaxy to secondGalaxy) || acc.contains(secondGalaxy to firstGalaxy)) {
                 listOf(null)
