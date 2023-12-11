@@ -2,6 +2,7 @@ package day11.initial
 
 import day11.initial.Image.Galaxy
 import day11.initial.Image.Space
+import util.add
 import java.io.File
 
 fun main() {
@@ -12,17 +13,42 @@ fun solvePart1() {
     val input = File("src/jvmMain/kotlin/day11/input/input_part1_test.txt")
     val grid = Grid(input.readLines())
 
+    println("Initial grid:")
+    println(grid.toPrintableString(includeLocation = false))
     println(grid.toPrintableString(includeLocation = true))
+    println()
+
+    println("Expanded grid:")
+    val expandedGrid = grid.expandSpace()
+    println(expandedGrid.toPrintableString(includeLocation = false))
+    println(expandedGrid.toPrintableString(includeLocation = true))
+    println()
 
     println()
 }
 
-//fun Grid<Image>.expandSpace(): Grid<Image> {
-//    rowList.fold(listOf(emptyList<Location<Image>>())) { acc, next ->
-//
-//        acc
-//    }
-//}
+fun Grid<Image>.expandSpace(): Grid<Image> {
+    val expandedRowGrid = rowList.fold(listOf(emptyList<Location<Image>>()) to 0) { (acc, additional), row ->
+        val newRow = row.map { it.copy(row = it.row + additional) }
+        if (newRow.all { it.value == Space }) {
+            val updatedNewRow = row.map { it.copy(row = it.row + additional + 1) }
+            acc.add(newRow).add(updatedNewRow) to additional + 1
+        } else {
+            acc.add(newRow) to additional
+        }
+    }.first.flatten().let(::Grid)
+
+    val expandedColumnGrid = expandedRowGrid.columnList.fold(listOf(emptyList<Location<Image>>()) to 0) { (acc, additional), column ->
+        val newColumn = column.map { it.copy(column = it.column + additional) }
+        if (newColumn.all { it.value == Space }) {
+            val newUpdatedColumn = column.map { it.copy(column = it.column + additional + 1) }
+            acc.add(newColumn).add(newUpdatedColumn) to additional + 1
+        } else {
+            acc.add(newColumn) to additional
+        }
+    }.first.flatten().let(::Grid)
+    return expandedColumnGrid
+}
 
 // ----------- Parsing
 
