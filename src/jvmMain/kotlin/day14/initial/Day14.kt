@@ -2,6 +2,7 @@ package day14.initial
 
 import day11.initial.Grid
 import day11.initial.Location
+import day11.initial.rotate
 import day11.initial.toPrintableString
 import java.io.File
 
@@ -17,23 +18,17 @@ fun solvePart1() {
     println(result)
     println()
 
-    val a = grid.columnList.map { row ->
-        val result = row.joinToString("") { it.toPrintableString() }
+    val tiltedGrid = grid.columnList.map { row ->
+        row.joinToString("") { it.toPrintableString() }
             .split("#")
             .joinToString("#") { section ->
                 val (rocks, space) = section.partition { it == 'O' }
                 rocks + space
             }
-        result
-    }
+    }.let(::Grid).rotate()
 
-    println(Grid(a).toPrintableString(includeLocation = false))
+    println(tiltedGrid.toPrintableString(includeLocation = false))
     println()
-
-    println(Grid(a).columnList .flatten().let(::Grid).toPrintableString(includeLocation = false))
-    println()
-
-
 }
 
 sealed class Image {

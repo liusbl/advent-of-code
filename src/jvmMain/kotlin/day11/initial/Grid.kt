@@ -13,7 +13,7 @@ data class Grid<T>(
 // TODO
 fun <T> Grid<T>.rotate(): Grid<T> {
     return this.columnList.map { it.map { it.copy(row = it.column, column = it.row) } }.flatten().let(::Grid) // Rotation done
-        .columnList.flatten().let(::Grid)
+//        .columnList.flatten().let(::Grid)
 }
 
 fun main() {
@@ -29,6 +29,7 @@ fun main() {
     println(str)
     println()
 
+    println("Rotated")
     val str2 = grid.rotate()/*.toPrintableString(includeLocation = true)*/
-    println(str2)
+    println(str2.toPrintableString(includeLocation = true))
 }
