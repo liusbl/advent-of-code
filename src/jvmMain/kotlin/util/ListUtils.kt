@@ -42,6 +42,6 @@ fun <T> List<T>.remove(value: T): List<T> {
     return this.toMutableList().apply { remove(value) }
 }
 
-fun <T> List<T>.remove(index: Int, value: T): List<T> {
-    return this.toMutableList().apply { add(index, value) }
+fun <T> List<T>.removeAt(index: Int): List<T> {
+    return this.toMutableList().apply { removeAt(index) }
 }
