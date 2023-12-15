@@ -37,3 +37,11 @@ fun <T> List<T>.add(index: Int, value: T): List<T> {
 }
 
 fun <T> List<T>.set(index: Int, value: T): List<T> = toMutableList().apply { set(index, value) }
+
+fun <T> List<T>.remove(value: T): List<T> {
+    return this.toMutableList().apply { remove(value) }
+}
+
+fun <T> List<T>.remove(index: Int, value: T): List<T> {
+    return this.toMutableList().apply { add(index, value) }
+}
