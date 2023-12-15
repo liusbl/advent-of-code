@@ -7,15 +7,16 @@ import day11.initial.toPrintableString
 import java.io.File
 
 fun main() {
-    solvePart1() // Solution:
+    solvePart1() // Solution: 112046, Time: 2023-12-15 23:41
 }
 
 fun solvePart1() {
-    val input = File("src/jvmMain/kotlin/day14/input/input_part1_test.txt")
+//    val input = File("src/jvmMain/kotlin/day14/input/input_part1_test.txt")
+    val input = File("src/jvmMain/kotlin/day14/input/input.txt")
     val grid = Grid(input.readLines())
 
-    val result = grid.toPrintableString(includeLocation = false)
-    println(result)
+    println("Input:")
+    println(grid.toPrintableString(includeLocation = false))
     println()
 
     val tiltedGrid = grid.columnList.map { row ->
@@ -27,8 +28,22 @@ fun solvePart1() {
             }
     }.let(::Grid).rotate()
 
+    println("Tilted grid:")
     println(tiltedGrid.toPrintableString(includeLocation = false))
     println()
+
+    val columnSize = tiltedGrid.columnList[0].size
+    val result = tiltedGrid.rowList.mapIndexed { rowIndex, row ->
+        row.sumOf { location ->
+            when(location.value) {
+                Image.Rock -> columnSize - rowIndex
+                Image.Space -> 0
+                Image.StableRock -> 0
+            }
+        }
+    }.sum()
+
+    println("Result: $result")
 }
 
 sealed class Image {
