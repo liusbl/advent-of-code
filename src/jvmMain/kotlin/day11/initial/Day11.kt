@@ -12,7 +12,7 @@ fun main() {
 fun solvePart1() {
 //    val input = File("src/jvmMain/kotlin/day11/input/input_part1_test.txt")
     val input = File("src/jvmMain/kotlin/day11/input/input.txt")
-    val grid = Grid(input.readLines())
+    val grid = Gridd(input.readLines())
 
     println("Initial grid:")
     println(grid.toPrintableString(includeLocation = false))
@@ -98,7 +98,7 @@ sealed interface Image {
     }
 }
 
-fun Grid(lines: List<String>): Grid<Image> {
+fun Gridd(lines: List<String>): Grid<Image> {
     val list = lines.flatMapIndexed { row, line ->
         line.mapIndexed { column, char ->
             Location(value = Image(char), row = row, column = column)
@@ -107,7 +107,7 @@ fun Grid(lines: List<String>): Grid<Image> {
     return Grid(list)
 }
 
-fun Grid<Image>.toPrintableString(includeLocation: Boolean): String =
+fun <T> Grid<T>.toPrintableString(includeLocation: Boolean): String =
     if (includeLocation) {
         rowList.joinToString(separator = "\n") { row ->
             row.joinToString(separator = " | ") { "${it.value},${it.row},${it.column}" }
@@ -125,4 +125,4 @@ fun Image(char: Char): Image =
         else -> error("Invalid image char: $char")
     }
 
-fun Location<Image>.toPrintableString(): String = value.toString()
+fun <T> Location<T>.toPrintableString(): String = value.toString()
