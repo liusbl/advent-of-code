@@ -9,7 +9,7 @@ fun main() {
 }
 
 fun solvePart1() {
-    val input = File("src/jvmMain/kotlin/day16/input/input_part2_test.txt")
+    val input = File("src/jvmMain/kotlin/day16/input/input_part1_test.txt")
     val lines = input.readLines()
 
     val grid = Grid(lines)
@@ -26,26 +26,35 @@ fun solvePart1() {
     println()
 
     var adv: Grid<Image> = initialBeamGrid
-    repeat((1..22).count()) {
-        adv = adv.advance()
-        println("Advanced")
-        println(adv.toPrintableString(includeLocation = false))
-        println()
+    while(true) {
+        val newGrid = adv.advance()
+        if (newGrid == null) {
+            println("FINISHED:")
+            println(adv.toPrintableString(includeLocation = false))
+            println()
+            println(adv.rowList.flatten().count { it.value.energized })
+            break
+        } else {
+            adv = newGrid
+            println("Advanced")
+            println(adv.toPrintableString(includeLocation = false))
+            println()
+        }
     }
 }
 
-fun Grid<Image>.advance(): Grid<Image> {
+fun Grid<Image>.advance(): Grid<Image>? {
     val grid = this
     val beamLocationList = grid.rowList.flatten().filter { it.value.beamList.isNotEmpty() }
     if (beamLocationList.isEmpty()) {
         // Finished!
-        return this
+        return null
     } else {
         val location = beamLocationList[0]
         val image = location.value
         val beam = image.beamList[0]
 
-        fun moveUp(): Grid<Image> =
+        fun moveUp(newDirection: Direction): Grid<Image> =
             grid.move(
                 fromRow = location.row,
                 fromColumn = location.column,
@@ -53,11 +62,11 @@ fun Grid<Image>.advance(): Grid<Image> {
                 toColumn = location.column,
                 filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
                 replaceValue = { oldValue: Image ->
-                    oldValue.update(energized = true, beamList = oldValue.beamList + beam)
+                    oldValue.update(energized = true, beamList = oldValue.beamList + Beam(newDirection))
                 }
             )
 
-        fun moveRight(): Grid<Image> =
+        fun moveRight(newDirection: Direction): Grid<Image> =
             grid.move(
                 fromRow = location.row,
                 fromColumn = location.column,
@@ -65,11 +74,11 @@ fun Grid<Image>.advance(): Grid<Image> {
                 toColumn = location.column + 1,
                 filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
                 replaceValue = { oldValue: Image ->
-                    oldValue.update(energized = true, beamList = oldValue.beamList + beam)
+                    oldValue.update(energized = true, beamList = oldValue.beamList + Beam(newDirection))
                 }
             )
 
-        fun moveDown(): Grid<Image> =
+        fun moveDown(newDirection: Direction): Grid<Image> =
             grid.move(
                 fromRow = location.row,
                 fromColumn = location.column,
@@ -77,11 +86,11 @@ fun Grid<Image>.advance(): Grid<Image> {
                 toColumn = location.column,
                 filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
                 replaceValue = { oldValue: Image ->
-                    oldValue.update(energized = true, beamList = oldValue.beamList + beam)
+                    oldValue.update(energized = true, beamList = oldValue.beamList + Beam(newDirection))
                 }
             )
 
-        fun moveLeft(): Grid<Image> =
+        fun moveLeft(newDirection: Direction): Grid<Image> =
             grid.move(
                 fromRow = location.row,
                 fromColumn = location.column,
@@ -89,53 +98,73 @@ fun Grid<Image>.advance(): Grid<Image> {
                 toColumn = location.column - 1,
                 filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
                 replaceValue = { oldValue: Image ->
-                    oldValue.update(energized = true, beamList = oldValue.beamList + beam)
+                    oldValue.update(energized = true, beamList = oldValue.beamList + Beam(newDirection))
                 }
             )
+
+        fun splitHorizontal(): Grid<Image> =
+            moveLeft(Direction.Left)
+                .update(
+                    row = location.row,
+                    column = location.column + 1,
+                    transform = { oldValue ->
+                        oldValue.update(energized = true, beamList = oldValue.beamList + Beam(Direction.Right))
+                    }
+                )
+
+        fun splitVertical(): Grid<Image> =
+            moveUp(Direction.Up)
+                .update(
+                    row = location.row + 1,
+                    column = location.column,
+                    transform = { oldValue ->
+                        oldValue.update(energized = true, beamList = oldValue.beamList + Beam(Direction.Down))
+                    }
+                )
 
         return when (image) {
             is Image.Mirror.Backward -> {
                 when (beam.direction) {
-                    Direction.Up -> moveLeft()
-                    Direction.Right -> moveDown()
-                    Direction.Down -> moveRight()
-                    Direction.Left -> moveUp()
+                    Direction.Up -> moveLeft(Direction.Left)
+                    Direction.Right -> moveDown(Direction.Down)
+                    Direction.Down -> moveRight(Direction.Right)
+                    Direction.Left -> moveUp(Direction.Up)
                 }
             }
 
             is Image.Mirror.Forward -> {
                 when (beam.direction) {
-                    Direction.Up -> moveRight()
-                    Direction.Right -> moveUp()
-                    Direction.Down -> moveLeft()
-                    Direction.Left -> moveDown()
+                    Direction.Up -> moveRight(Direction.Right)
+                    Direction.Right -> moveUp(Direction.Up)
+                    Direction.Down -> moveLeft(Direction.Left)
+                    Direction.Left -> moveDown(Direction.Down)
                 }
             }
 
             is Image.Space -> {
                 when (beam.direction) {
-                    Direction.Up -> moveUp()
-                    Direction.Right -> moveRight()
-                    Direction.Down -> moveDown()
-                    Direction.Left -> moveLeft()
+                    Direction.Up -> moveUp(Direction.Up)
+                    Direction.Right -> moveRight(Direction.Right)
+                    Direction.Down -> moveDown(Direction.Down)
+                    Direction.Left -> moveLeft(Direction.Left)
                 }
             }
 
             is Image.Splitter.Horizontal -> {
                 when (beam.direction) {
-                    Direction.Up -> TODO()
-                    Direction.Right -> moveRight()
-                    Direction.Down -> TODO()
-                    Direction.Left -> moveLeft()
+                    Direction.Up -> splitHorizontal()
+                    Direction.Right -> moveRight(Direction.Right)
+                    Direction.Down -> splitHorizontal()
+                    Direction.Left -> moveLeft(Direction.Left)
                 }
             }
 
             is Image.Splitter.Vertical -> {
                 when (beam.direction) {
-                    Direction.Up -> moveUp()
-                    Direction.Right -> TODO()
-                    Direction.Down -> moveDown()
-                    Direction.Left -> TODO()
+                    Direction.Up -> moveUp(Direction.Up)
+                    Direction.Right -> splitVertical()
+                    Direction.Down -> moveDown(Direction.Down)
+                    Direction.Left -> splitVertical()
                 }
 
             }
@@ -215,21 +244,16 @@ sealed class Image {
         override fun toString(): String = toPrintableString()
     }
 
-    fun toPrintableString(): String = when {
-        beamList.isNotEmpty() -> {
-            beamList.singleOrNull()?.direction?.char?.toString()
-                ?: beamList.size.toString().last().toString()
-        }
-        this is Splitter || this is Mirror -> char.toString()
-        energized -> "E"
-        else -> char.toString()
+    fun toPrintableString(): String = if (beamList.isNotEmpty()) {
+        beamList.singleOrNull()?.direction?.char?.toString()
+            ?: beamList.size.toString().last().toString()
+    } else if (this is Splitter || this is Mirror) {
+        char.toString()
+    } else if (energized) {
+        "E"
+    } else {
+        char.toString()
     }
-}
-
-data class Collector(
-    val grid: Grid<Image>
-) {
-    override fun toString(): String = grid.toPrintableString(includeLocation = false)
 }
 
 data class Beam(

@@ -18,7 +18,14 @@ fun <T> Grid<T>.inBounds(row: Int, column: Int): Boolean =
             row < rowList.size &&
             column < columnList.size
 
-fun <T> Grid<T>.move(fromRow: Int, fromColumn: Int, toRow: Int, toColumn: Int, filledValue: T, replaceValue: (oldValue: T) -> T): Grid<T> {
+fun <T> Grid<T>.move(
+    fromRow: Int,
+    fromColumn: Int,
+    toRow: Int,
+    toColumn: Int,
+    filledValue: T,
+    replaceValue: (oldValue: T) -> T
+): Grid<T> {
     return update(fromRow, fromColumn) { filledValue }
         .run {
             if (inBounds(toRow, toColumn)) {
@@ -31,10 +38,14 @@ fun <T> Grid<T>.move(fromRow: Int, fromColumn: Int, toRow: Int, toColumn: Int, f
 }
 
 fun <T> Grid<T>.update(row: Int, column: Int, transform: (T) -> T): Grid<T> {
-    val location = rowList[row][column]
-    val newRow = rowList[row].set(column, location.copy(value = transform(location.value)))
-    val newRowList = rowList.set(row, newRow)
-    return Grid(newRowList.flatten())
+    return if (inBounds(row, column)) {
+        val location = rowList[row][column]
+        val newRow = rowList[row].set(column, location.copy(value = transform(location.value)))
+        val newRowList = rowList.set(row, newRow)
+        Grid(newRowList.flatten())
+    } else {
+        this
+    }
 }
 
 // TODO
