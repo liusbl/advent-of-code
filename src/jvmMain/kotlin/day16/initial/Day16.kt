@@ -20,24 +20,65 @@ fun solvePart1() {
 
 sealed class Image {
     abstract val char: Char
+    abstract val energized: Boolean
+    abstract val beam: Beam?
 
-    sealed class Splitter(override val char: Char) : Image() {
-        object Vertical : Splitter('|')
+    sealed class Splitter(
+        override val char: Char,
+        override val energized: Boolean,
+        override val beam: Beam?
+    ) : Image() {
+        data class Vertical(
+            override val energized: Boolean,
+            override val beam: Beam?
+        ) : Splitter('|', energized, beam)
 
-        object Horizontal : Splitter('-')
+        data class Horizontal(
+            override val energized: Boolean,
+            override val beam: Beam?
+        ) : Splitter('-', energized, beam)
     }
 
-    sealed class Mirror(override val char: Char) : Image() {
-        object Forward : Mirror('/')
+    sealed class Mirror(
+        override val char: Char,
+        override val energized: Boolean,
+        override val beam: Beam?
+    ) : Image() {
+        data class Forward(
+            override val energized: Boolean,
+            override val beam: Beam?
+        ) : Mirror('/', energized, beam)
 
-        object Backward : Mirror('\\')
+        data class Backward(
+            override val energized: Boolean,
+            override val beam: Beam?
+        ) : Mirror('\\', energized, beam)
     }
 
-    object Space : Image() {
+    data class Space(
+        override val energized: Boolean,
+        override val beam: Beam?
+    ) : Image() {
         override val char = '.'
     }
 
     override fun toString(): String = char.toString()
+}
+
+data class Collector(
+    val beamList: List<Beam>,
+    val grid: Grid<Image>
+)
+
+data class Beam(
+    val direction: Direction
+)
+
+enum class Direction {
+    Up,
+    Right,
+    Down,
+    Left
 }
 
 fun Grid(lines: List<String>): Grid<Image> {
@@ -51,10 +92,10 @@ fun Grid(lines: List<String>): Grid<Image> {
 
 fun Image(char: Char): Image =
     when (char) {
-        Image.Splitter.Vertical.char -> Image.Splitter.Vertical
-        Image.Splitter.Horizontal.char -> Image.Splitter.Horizontal
-        Image.Mirror.Forward.char -> Image.Mirror.Forward
-        Image.Mirror.Backward.char -> Image.Mirror.Backward
-        Image.Space.char -> Image.Space
+        '|' -> Image.Splitter.Vertical(energized = false, beam = null)
+        '-' -> Image.Splitter.Horizontal(energized = false, beam = null)
+        '/' -> Image.Mirror.Forward(energized = false, beam = null)
+        '\\' -> Image.Mirror.Backward(energized = false, beam = null)
+        '.' -> Image.Space(energized = false, beam = null)
         else -> error("Invalid image char: $char")
     }
