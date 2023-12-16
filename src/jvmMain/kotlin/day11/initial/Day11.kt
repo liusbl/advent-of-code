@@ -107,17 +107,6 @@ fun Gridd(lines: List<String>): Grid<Image> {
     return Grid(list)
 }
 
-fun <T> Grid<T>.toPrintableString(includeLocation: Boolean): String =
-    if (includeLocation) {
-        rowList.joinToString(separator = "\n") { row ->
-            row.joinToString(separator = " | ") { "${it.value},${it.row},${it.column}" }
-        }
-    } else {
-        rowList.joinToString(separator = "\n") { row ->
-            row.joinToString(separator = "") { location -> location.toPrintableString() }
-        }
-    }
-
 fun Image(char: Char): Image =
     when (char) {
         '#' -> Galaxy(char)
