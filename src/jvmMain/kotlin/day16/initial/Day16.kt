@@ -26,7 +26,8 @@ fun solvePart1() {
     println()
 
     var adv: Grid<Image> = initialBeamGrid
-    while(true) {
+    var index = 0
+    while(index < 50) {
         val newGrid = adv.advance()
         if (newGrid == null) {
             println("FINISHED:")
@@ -36,7 +37,7 @@ fun solvePart1() {
             break
         } else {
             adv = newGrid
-            println("Advanced")
+            println("Advanced. Iteration: ${++index}")
             println(adv.toPrintableString(includeLocation = false))
             println()
         }
@@ -60,7 +61,7 @@ fun Grid<Image>.advance(): Grid<Image>? {
                 fromColumn = location.column,
                 toRow = location.row - 1,
                 toColumn = location.column,
-                filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
+                filledValue = image.update(energized = true, beamList = image.beamList.remove(beam)),
                 replaceValue = { oldValue: Image ->
                     oldValue.update(energized = true, beamList = oldValue.beamList + Beam(newDirection))
                 }
@@ -72,7 +73,7 @@ fun Grid<Image>.advance(): Grid<Image>? {
                 fromColumn = location.column,
                 toRow = location.row,
                 toColumn = location.column + 1,
-                filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
+                filledValue = image.update(energized = true, beamList = image.beamList.remove(beam)),
                 replaceValue = { oldValue: Image ->
                     oldValue.update(energized = true, beamList = oldValue.beamList + Beam(newDirection))
                 }
@@ -84,7 +85,7 @@ fun Grid<Image>.advance(): Grid<Image>? {
                 fromColumn = location.column,
                 toRow = location.row + 1,
                 toColumn = location.column,
-                filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
+                filledValue = image.update(energized = true, beamList = image.beamList.remove(beam)),
                 replaceValue = { oldValue: Image ->
                     oldValue.update(energized = true, beamList = oldValue.beamList + Beam(newDirection))
                 }
@@ -96,7 +97,7 @@ fun Grid<Image>.advance(): Grid<Image>? {
                 fromColumn = location.column,
                 toRow = location.row,
                 toColumn = location.column - 1,
-                filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
+                filledValue = image.update(energized = true, beamList = image.beamList.remove(beam)),
                 replaceValue = { oldValue: Image ->
                     oldValue.update(energized = true, beamList = oldValue.beamList + Beam(newDirection))
                 }
@@ -244,15 +245,18 @@ sealed class Image {
         override fun toString(): String = toPrintableString()
     }
 
-    fun toPrintableString(): String = if (beamList.isNotEmpty()) {
-        beamList.singleOrNull()?.direction?.char?.toString()
-            ?: beamList.size.toString().last().toString()
-    } else if (this is Splitter || this is Mirror) {
-        char.toString()
-    } else if (energized) {
-        "E"
-    } else {
-        char.toString()
+    fun toPrintableString(): String {
+        val a =  if (beamList.isNotEmpty()) {
+            beamList.singleOrNull()?.direction?.char?.toString()
+                ?: beamList.size.toString().last().toString()
+        } else if (this is Splitter || this is Mirror) {
+            char.toString()
+        } else if (energized) {
+            "E"
+        } else {
+            char.toString()
+        }
+        return a
     }
 }
 
