@@ -13,9 +13,10 @@ fun solvePart1() {
     val input = File("src/jvmMain/kotlin/day16/input/input_part1_test.txt")
     val lines = input.readLines()
 
-    val result = Grid(lines).toPrintableString(includeLocation = false)
-
-    println(result)
+    val grid = Grid(lines)
+    println("Input:")
+    println(grid.toPrintableString(includeLocation = false))
+    println()
 }
 
 sealed class Image {
@@ -31,12 +32,16 @@ sealed class Image {
         data class Vertical(
             override val energized: Boolean,
             override val beam: Beam?
-        ) : Splitter('|', energized, beam)
+        ) : Splitter('|', energized, beam) {
+            override fun toString(): String = char.toString()
+        }
 
         data class Horizontal(
             override val energized: Boolean,
             override val beam: Beam?
-        ) : Splitter('-', energized, beam)
+        ) : Splitter('-', energized, beam) {
+            override fun toString(): String = char.toString()
+        }
     }
 
     sealed class Mirror(
@@ -47,12 +52,16 @@ sealed class Image {
         data class Forward(
             override val energized: Boolean,
             override val beam: Beam?
-        ) : Mirror('/', energized, beam)
+        ) : Mirror('/', energized, beam) {
+            override fun toString(): String = char.toString()
+        }
 
         data class Backward(
             override val energized: Boolean,
             override val beam: Beam?
-        ) : Mirror('\\', energized, beam)
+        ) : Mirror('\\', energized, beam) {
+            override fun toString(): String = char.toString()
+        }
     }
 
     data class Space(
@@ -60,9 +69,9 @@ sealed class Image {
         override val beam: Beam?
     ) : Image() {
         override val char = '.'
-    }
 
-    override fun toString(): String = char.toString()
+        override fun toString(): String = char.toString()
+    }
 }
 
 data class Collector(
