@@ -198,7 +198,7 @@ sealed class Image {
             beamList.singleOrNull()?.direction?.char?.toString()
                 ?: beamList.size.toString().last().toString()
         }
-
+        this is Splitter || this is Mirror -> char.toString()
         energized -> "E"
         else -> char.toString()
     }
