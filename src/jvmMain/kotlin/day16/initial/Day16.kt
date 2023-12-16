@@ -95,11 +95,21 @@ fun Grid<Image>.advance(): Grid<Image> {
 
         return when (image) {
             is Image.Mirror.Backward -> {
-                TODO()
+                when (beam.direction) {
+                    Direction.Up -> moveLeft()
+                    Direction.Right -> moveDown()
+                    Direction.Down -> moveRight()
+                    Direction.Left -> moveUp()
+                }
             }
 
             is Image.Mirror.Forward -> {
-                TODO()
+                when (beam.direction) {
+                    Direction.Up -> moveRight()
+                    Direction.Right -> moveUp()
+                    Direction.Down -> moveLeft()
+                    Direction.Left -> moveDown()
+                }
             }
 
             is Image.Space -> {
@@ -122,9 +132,9 @@ fun Grid<Image>.advance(): Grid<Image> {
 
             is Image.Splitter.Vertical -> {
                 when (beam.direction) {
-                    Direction.Up -> TODO()
+                    Direction.Up -> moveUp()
                     Direction.Right -> TODO()
-                    Direction.Down -> TODO()
+                    Direction.Down -> moveDown()
                     Direction.Left -> TODO()
                 }
 
