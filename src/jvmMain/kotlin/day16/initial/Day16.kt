@@ -44,6 +44,55 @@ fun Grid<Image>.advance(): Grid<Image> {
         val location = beamLocationList[0]
         val image = location.value
         val beam = image.beamList[0]
+
+        fun moveUp(): Grid<Image> =
+            grid.move(
+                fromRow = location.row,
+                fromColumn = location.column,
+                toRow = location.row - 1,
+                toColumn = location.column,
+                filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
+                replaceValue = { oldValue: Image ->
+                    oldValue.update(energized = true, beamList = oldValue.beamList + beam)
+                }
+            )
+
+        fun moveRight(): Grid<Image> =
+            grid.move(
+                fromRow = location.row,
+                fromColumn = location.column,
+                toRow = location.row,
+                toColumn = location.column + 1,
+                filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
+                replaceValue = { oldValue: Image ->
+                    oldValue.update(energized = true, beamList = oldValue.beamList + beam)
+                }
+            )
+
+        fun moveDown(): Grid<Image> =
+            grid.move(
+                fromRow = location.row,
+                fromColumn = location.column,
+                toRow = location.row + 1,
+                toColumn = location.column,
+                filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
+                replaceValue = { oldValue: Image ->
+                    oldValue.update(energized = true, beamList = oldValue.beamList + beam)
+                }
+            )
+
+        fun moveLeft(): Grid<Image> =
+            grid.move(
+                fromRow = location.row,
+                fromColumn = location.column,
+                toRow = location.row,
+                toColumn = location.column - 1,
+                filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
+                replaceValue = { oldValue: Image ->
+                    oldValue.update(energized = true, beamList = oldValue.beamList + beam)
+                }
+            )
+
         return when (image) {
             is Image.Mirror.Backward -> {
                 TODO()
@@ -55,70 +104,33 @@ fun Grid<Image>.advance(): Grid<Image> {
 
             is Image.Space -> {
                 when (beam.direction) {
-                    Direction.Up -> {
-                        grid.move(
-                            fromRow = location.row,
-                            fromColumn = location.column,
-                            toRow = location.row - 1,
-                            toColumn = location.column,
-                            filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
-                            replaceValue = { oldValue: Image ->
-                                oldValue.update(energized = true, beamList = oldValue.beamList + beam)
-                            }
-                        )
-                    }
-
-                    Direction.Right -> {
-                        grid.move(
-                            fromRow = location.row,
-                            fromColumn = location.column,
-                            toRow = location.row,
-                            toColumn = location.column + 1,
-                            filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
-                            replaceValue = { oldValue: Image ->
-                                oldValue.update(energized = true, beamList = oldValue.beamList + beam)
-                            }
-                        )
-                    }
-
-                    Direction.Down -> {
-                        grid.move(
-                            fromRow = location.row,
-                            fromColumn = location.column,
-                            toRow = location.row + 1,
-                            toColumn = location.column,
-                            filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
-                            replaceValue = { oldValue: Image ->
-                                oldValue.update(energized = true, beamList = oldValue.beamList + beam)
-                            }
-                        )
-                    }
-
-                    Direction.Left -> {
-                        grid.move(
-                            fromRow = location.row,
-                            fromColumn = location.column,
-                            toRow = location.row,
-                            toColumn = location.column - 1,
-                            filledValue = Image.Space(energized = true, beamList = image.beamList.remove(beam)),
-                            replaceValue = { oldValue: Image ->
-                                oldValue.update(energized = true, beamList = oldValue.beamList + beam)
-                            }
-                        )
-                    }
+                    Direction.Up -> moveUp()
+                    Direction.Right -> moveRight()
+                    Direction.Down -> moveDown()
+                    Direction.Left -> moveLeft()
                 }
             }
 
             is Image.Splitter.Horizontal -> {
-                TODO()
+                when (beam.direction) {
+                    Direction.Up -> TODO()
+                    Direction.Right -> moveRight()
+                    Direction.Down -> TODO()
+                    Direction.Left -> moveLeft()
+                }
             }
 
             is Image.Splitter.Vertical -> {
-                TODO()
+                when (beam.direction) {
+                    Direction.Up -> TODO()
+                    Direction.Right -> TODO()
+                    Direction.Down -> TODO()
+                    Direction.Left -> TODO()
+                }
+
             }
         }
     }
-    return this
 }
 
 // ---------
