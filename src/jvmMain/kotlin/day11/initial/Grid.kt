@@ -12,6 +12,24 @@ data class Grid<T>(
     val columnList: List<List<Location<T>>> = locationList.groupBy { it.column }.map { it.value }
 }
 
+fun <T> Grid<T>.inBounds(row: Int, column: Int): Boolean =
+    row >= 0 &&
+            column >= 0 &&
+            row < rowList.size &&
+            column < columnList.size
+
+fun <T> Grid<T>.move(fromRow: Int, fromColumn: Int, toRow: Int, toColumn: Int, filledValue: T, replaceValue: (oldValue: T) -> T): Grid<T> {
+    return update(fromRow, fromColumn) { filledValue }
+        .run {
+            if (inBounds(toRow, toColumn)) {
+                val toValue = rowList[toRow][toColumn].value
+                update(toRow, toColumn) { replaceValue(toValue) }
+            } else {
+                this
+            }
+        }
+}
+
 fun <T> Grid<T>.update(row: Int, column: Int, transform: (T) -> T): Grid<T> {
     val location = rowList[row][column]
     val newRow = rowList[row].set(column, location.copy(value = transform(location.value)))
