@@ -1,5 +1,7 @@
 package day11.initial
 
+import util.set
+
 data class Grid<T>(
     // TODO this can be improved by forcing creation by row list or column list.
     //  Now this is ambiguous, but indeded to be created from flattened row list
@@ -10,10 +12,16 @@ data class Grid<T>(
     val columnList: List<List<Location<T>>> = locationList.groupBy { it.column }.map { it.value }
 }
 
+fun <T> Grid<T>.update(row: Int, column: Int, transform: (T) -> T): Grid<T> {
+    val location = rowList[row][column]
+    val newRow = rowList[row].set(column, location.copy(value = transform(location.value)))
+    val newRowList = rowList.set(row, newRow)
+    return Grid(newRowList.flatten())
+}
+
 // TODO
 fun <T> Grid<T>.rotate(): Grid<T> {
-    return this.columnList.map { it.map { it.copy(row = it.column, column = it.row) } }.flatten().let(::Grid) // Rotation done
-//        .columnList.flatten().let(::Grid)
+    return this.columnList.map { it.map { it.copy(row = it.column, column = it.row) } }.flatten().let(::Grid)
 }
 
 fun <T> Grid<T>.toPrintableString(includeLocation: Boolean): String =
