@@ -1,6 +1,6 @@
 package _2023.day16.initial
 
-import day11.initial.*
+import _2023.day11.initial.*
 import util.remove
 import java.io.File
 

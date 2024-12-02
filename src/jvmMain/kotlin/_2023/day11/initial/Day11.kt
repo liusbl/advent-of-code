@@ -1,7 +1,7 @@
 package _2023.day11.initial
 
-import day11.initial.Image.Galaxy
-import day11.initial.Image.Space
+import _2023.day11.initial.Image.Galaxy
+import _2023.day11.initial.Image.Space
 import util.add
 import java.io.File
 

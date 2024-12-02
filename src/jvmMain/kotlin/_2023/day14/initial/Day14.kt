@@ -1,9 +1,9 @@
 package _2023.day14.initial
 
-import day11.initial.Grid
-import day11.initial.Location
-import day11.initial.rotate
-import day11.initial.toPrintableString
+import _2023.day11.initial.Grid
+import _2023.day11.initial.Location
+import _2023.day11.initial.rotate
+import _2023.day11.initial.toPrintableString
 import java.io.File
 
 fun main() {
