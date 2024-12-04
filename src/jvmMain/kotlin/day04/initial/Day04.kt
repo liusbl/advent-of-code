@@ -9,13 +9,46 @@ fun main() {
     // Started: 2024-12-04 11:02
     // Finished:  2024-12-04 11:44
     // Solution: 2468
-    solvePart1()
+//    solvePart1()
 
-    // Started:
-    // Finished:
-    // Solution:
-    //solvePart2()
+    // Started: 2024-12-04 11:44
+    // Finished: 2024-12-04 11:55
+    // Solution: 1864
+    solvePart2()
 }
+
+
+fun solvePart2() {
+    val input = File("src/jvmMain/kotlin/day04/input/input.txt")
+    val lines = input.readLines()
+    var count = 0
+    lines.forEachIndexed { lineIndex, line ->
+        line.forEachIndexed { letterIndex, letter ->
+            if (lineIndex == 0 || letterIndex == 0 || lineIndex == lines.size - 1 || letterIndex == line.length - 1) {
+                // Nothing
+            } else {
+                if (letter == 'A') {
+                    // Attempt to find MAS from 4 directions: TopLeft, TopRight, BottomRight, BottomLeft
+                    val masCount = listOf(
+                        lines.textDownRight(lineIndex - 1, letterIndex - 1, 3),
+                        lines.textDownLeft(lineIndex - 1, letterIndex + 1, 3),
+                        lines.textUpLeft(lineIndex + 1, letterIndex + 1, 3),
+                        lines.textUpRight(lineIndex + 1, letterIndex - 1, 3)
+                    ).count { it == "MAS" }
+                    println(masCount)
+                    if (masCount == 2) {
+                        count++
+                    }
+                }
+            }
+        }
+    }
+
+    val result = count
+
+    println(result)
+}
+
 
 fun solvePart1() {
     val input = File("src/jvmMain/kotlin/day04/input/input.txt")
@@ -43,7 +76,6 @@ fun solvePart1() {
 
     println(result)
 }
-
 
 private fun List<String>.textUp(lineIndex: Int, letterIndex: Int, letterCount: Int = 4): String {
     var lineIndexAddition = 0
@@ -138,15 +170,6 @@ private fun List<String>.textUpLeft(lineIndex: Int, letterIndex: Int, letterCoun
         result += this[lineIndex + lineIndexAddition--][letterIndex + letterIndexAddition--]
     }
     return result
-}
-
-fun solvePart2() {
-    val input = File("src/jvmMain/kotlin/day04/input/input_part1_test.txt")
-    val lines = input.readLines()
-
-    val result = "result"
-
-    println(result)
 }
 
 private fun test() {
