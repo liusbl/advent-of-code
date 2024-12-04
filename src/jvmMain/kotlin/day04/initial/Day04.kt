@@ -1,7 +1,6 @@
 package day04.initial
 
 import java.io.File
-import kotlin.math.abs
 
 fun main() {
     test() // Needed to verify text directions
@@ -22,6 +21,7 @@ fun solvePart2() {
     val input = File("src/jvmMain/kotlin/day04/input/input.txt")
     val lines = input.readLines()
     var count = 0
+
     lines.forEachIndexed { lineIndex, line ->
         line.forEachIndexed { letterIndex, letter ->
             if (lineIndex == 0 || letterIndex == 0 || lineIndex == lines.size - 1 || letterIndex == line.length - 1) {
@@ -30,10 +30,10 @@ fun solvePart2() {
                 if (letter == 'A') {
                     // Attempt to find MAS from 4 directions: UpLeft, UpRight, BottomRight, BottomLeft
                     val masCount = listOf(
-                        lines.text(Down + Right, lineIndex - 1, letterIndex - 1, 3),
-                        lines.text(Down + Left, lineIndex - 1, letterIndex + 1, 3),
-                        lines.text(Up + Left, lineIndex + 1, letterIndex + 1, 3),
-                        lines.text(Up + Right, lineIndex + 1, letterIndex - 1, 3)
+                        lines.text(IndexUpdater.Down + IndexUpdater.Right, lineIndex - 1, letterIndex - 1, 3),
+                        lines.text(IndexUpdater.Down + IndexUpdater.Left, lineIndex - 1, letterIndex + 1, 3),
+                        lines.text(IndexUpdater.Up + IndexUpdater.Left, lineIndex + 1, letterIndex + 1, 3),
+                        lines.text(IndexUpdater.Up + IndexUpdater.Right, lineIndex + 1, letterIndex - 1, 3)
                     ).count { it == "MAS" }
                     println(masCount)
                     if (masCount == 2) {
@@ -49,25 +49,17 @@ fun solvePart2() {
     println(result)
 }
 
-
 fun solvePart1() {
     val input = File("src/jvmMain/kotlin/day04/input/input.txt")
     val lines = input.readLines()
     var count = 0
+    val indexUpdaterList = IndexUpdater.all()
     lines.forEachIndexed { lineIndex, line ->
         line.forEachIndexed { letterIndex, letter ->
             if (letter == 'X') {
                 // Attempt to find XMAS in all directions
-                count += listOf(
-                    lines.text(indexUpdater = Up, lineIndex, letterIndex, letterCount = 4),
-                    lines.text(indexUpdater = Up + Right, lineIndex, letterIndex, letterCount = 4),
-                    lines.text(indexUpdater = Right, lineIndex, letterIndex, letterCount = 4),
-                    lines.text(indexUpdater = Down + Right, lineIndex, letterIndex, letterCount = 4),
-                    lines.text(indexUpdater = Down, lineIndex, letterIndex, letterCount = 4),
-                    lines.text(indexUpdater = Down + Left, lineIndex, letterIndex, letterCount = 4),
-                    lines.text(indexUpdater = Left, lineIndex, letterIndex, letterCount = 4),
-                    lines.text(indexUpdater = Up + Left,lineIndex, letterIndex, letterCount = 4)
-                ).count { it == "XMAS" }
+                count += indexUpdaterList.map { lines.text(it, lineIndex, letterIndex, letterCount = 4) }
+                    .count { it == "XMAS" }
             }
         }
     }
@@ -108,38 +100,46 @@ interface IndexUpdater {
             }
         }
     }
+
+    object Up : IndexUpdater {
+        override fun update(lines: List<String>, point: Point): Point? =
+            point.copy(lineIndex = point.lineIndex - 1).takeIf { it.lineIndex >= 0 }
+    }
+
+    object Right : IndexUpdater {
+        override fun update(lines: List<String>, point: Point): Point? =
+            point.copy(letterIndex = point.letterIndex + 1).takeIf { it.letterIndex < lines[0].length }
+    }
+
+    object Down : IndexUpdater {
+        override fun update(lines: List<String>, point: Point): Point? =
+            point.copy(lineIndex = point.lineIndex + 1).takeIf { it.lineIndex < lines.size }
+    }
+
+    object Left : IndexUpdater {
+        override fun update(lines: List<String>, point: Point): Point? =
+            point.copy(letterIndex = point.letterIndex - 1).takeIf { it.letterIndex >= 0 }
+    }
+
+    companion object {
+        fun all() = orthogonal() + diagonal()
+
+        fun diagonal() = listOf(
+            Up + Right,
+            Down + Right,
+            Down + Left,
+            Up + Left
+        )
+
+        fun orthogonal() = listOf(
+            Up,
+            Right,
+            Down,
+            Left
+        )
+    }
 }
 
-object Up : IndexUpdater {
-    override fun update(lines: List<String>, point: Point): Point? =
-        point.copy(lineIndex = point.lineIndex - 1).takeIf { it.lineIndex >= 0 }
-}
-
-object Right : IndexUpdater {
-    override fun update(lines: List<String>, point: Point): Point? =
-        point.copy(letterIndex = point.letterIndex + 1).takeIf { it.letterIndex < lines[0].length }
-}
-
-object Down : IndexUpdater {
-    override fun update(lines: List<String>, point: Point): Point? =
-        point.copy(lineIndex = point.lineIndex + 1).takeIf { it.lineIndex < lines.size }
-}
-
-object Left : IndexUpdater {
-    override fun update(lines: List<String>, point: Point): Point? =
-        point.copy(letterIndex = point.letterIndex - 1).takeIf { it.letterIndex >= 0 }
-}
-
-val updaterList = listOf(
-    Up,
-    Up + Right,
-    Right,
-    Down + Right,
-    Down,
-    Down + Left,
-    Left,
-    Up + Left
-)
 
 private fun test() {
     testTextUp_regular()
@@ -170,7 +170,7 @@ private fun testTextUp_regular() {
         ****
     """.trimIndent()
 
-    val result = input.lines().text(Up, 4, 1, 4)
+    val result = input.lines().text(IndexUpdater.Up, 4, 1, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -188,7 +188,7 @@ private fun testTextUp_cut_off() {
         ****
     """.trimIndent()
 
-    val result = input.lines().text(Up, 2, 1, 4)
+    val result = input.lines().text(IndexUpdater.Up, 2, 1, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -208,7 +208,7 @@ private fun testTextUpRight_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().text(Up + Right,4, 1, 4)
+    val result = input.lines().text(IndexUpdater.Up + IndexUpdater.Right,4, 1, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -228,7 +228,7 @@ private fun testTextUpRight_cut_off() {
         ****
     """.trimIndent()
 
-    val result = input.lines().text(Up + Right, 4, 1, 4)
+    val result = input.lines().text(IndexUpdater.Up + IndexUpdater.Right, 4, 1, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -248,7 +248,7 @@ private fun testTextRight_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().text(Right, 4, 1, 4)
+    val result = input.lines().text(IndexUpdater.Right, 4, 1, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -268,7 +268,7 @@ private fun testTextRight_cut_off() {
         ****
     """.trimIndent()
 
-    val result = input.lines().text(Right, 4, 1, 4)
+    val result = input.lines().text(IndexUpdater.Right, 4, 1, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -289,7 +289,7 @@ private fun testTextDownRight_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().text(Down + Right, 2, 1, 4)
+    val result = input.lines().text(IndexUpdater.Down + IndexUpdater.Right, 2, 1, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -308,7 +308,7 @@ private fun testTextDownRight_cut_off() {
         ***A**
     """.trimIndent()
 
-    val result = input.lines().text(Down + Right, 2, 1, 4)
+    val result = input.lines().text(IndexUpdater.Down + IndexUpdater.Right, 2, 1, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -329,7 +329,7 @@ private fun testTextDown_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().text(Down, 2, 1, 4)
+    val result = input.lines().text(IndexUpdater.Down, 2, 1, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -348,7 +348,7 @@ private fun testTextDown_cut_off() {
         *A****
     """.trimIndent()
 
-    val result = input.lines().text(Down, 2, 1, 4)
+    val result = input.lines().text(IndexUpdater.Down, 2, 1, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -369,7 +369,7 @@ private fun testTextDownLeft_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().text(Down + Left, 2, 4, 4)
+    val result = input.lines().text(IndexUpdater.Down + IndexUpdater.Left, 2, 4, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -390,7 +390,7 @@ private fun testTextDownLeft_cut_off() {
         ****
     """.trimIndent()
 
-    val result = input.lines().text(Down + Left, 2, 2, 4)
+    val result = input.lines().text(IndexUpdater.Down + IndexUpdater.Left, 2, 2, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -411,7 +411,7 @@ private fun testTextLeft_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().text(Left, 2, 4, 4)
+    val result = input.lines().text(IndexUpdater.Left, 2, 4, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -432,7 +432,7 @@ private fun testTextLeft_cut_off() {
          ****
     """.trimIndent()
 
-    val result = input.lines().text(Left, 2, 2, 4)
+    val result = input.lines().text(IndexUpdater.Left, 2, 2, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -454,7 +454,7 @@ private fun testTextUpLeft_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().text(Up + Left, 4, 4, 4)
+    val result = input.lines().text(IndexUpdater.Up + IndexUpdater.Left, 4, 4, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -475,7 +475,7 @@ private fun testTextUpLeft_cut_off() {
          ****
     """.trimIndent()
 
-    val result = input.lines().text(Up + Left, 4, 2, 4)
+    val result = input.lines().text(IndexUpdater.Up + IndexUpdater.Left, 4, 2, 4)
 
     val expected = "XMA"
     if (expected == result) {
