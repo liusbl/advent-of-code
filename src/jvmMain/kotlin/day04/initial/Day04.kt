@@ -4,7 +4,7 @@ import java.io.File
 import kotlin.math.abs
 
 fun main() {
-//    test() // Needed to verify text directions
+    test() // Needed to verify text directions
 
     // Started: 2024-12-04 11:02
     // Finished:  2024-12-04 11:44
@@ -14,7 +14,7 @@ fun main() {
     // Started: 2024-12-04 11:44
     // Finished: 2024-12-04 11:55
     // Solution: 1864
-    solvePart2()
+//    solvePart2()
 }
 
 
@@ -28,12 +28,12 @@ fun solvePart2() {
                 // Nothing
             } else {
                 if (letter == 'A') {
-                    // Attempt to find MAS from 4 directions: TopLeft, TopRight, BottomRight, BottomLeft
+                    // Attempt to find MAS from 4 directions: UpLeft, UpRight, BottomRight, BottomLeft
                     val masCount = listOf(
-                        lines.textDownRight(lineIndex - 1, letterIndex - 1, 3),
-                        lines.textDownLeft(lineIndex - 1, letterIndex + 1, 3),
-                        lines.textUpLeft(lineIndex + 1, letterIndex + 1, 3),
-                        lines.textUpRight(lineIndex + 1, letterIndex - 1, 3)
+                        lines.text(Down + Right, lineIndex - 1, letterIndex - 1, 3),
+                        lines.text(Down + Left, lineIndex - 1, letterIndex + 1, 3),
+                        lines.text(Up + Left, lineIndex + 1, letterIndex + 1, 3),
+                        lines.text(Up + Right, lineIndex + 1, letterIndex - 1, 3)
                     ).count { it == "MAS" }
                     println(masCount)
                     if (masCount == 2) {
@@ -59,14 +59,14 @@ fun solvePart1() {
             if (letter == 'X') {
                 // Attempt to find XMAS in all directions
                 count += listOf(
-                    lines.textUp(lineIndex, letterIndex),
-                    lines.textUpRight(lineIndex, letterIndex),
-                    lines.textRight(lineIndex, letterIndex),
-                    lines.textDownRight(lineIndex, letterIndex),
-                    lines.textDown(lineIndex, letterIndex),
-                    lines.textDownLeft(lineIndex, letterIndex),
-                    lines.textLeft(lineIndex, letterIndex),
-                    lines.textUpLeft(lineIndex, letterIndex)
+                    lines.text(indexUpdater = Up, lineIndex, letterIndex, letterCount = 4),
+                    lines.text(indexUpdater = Up + Right, lineIndex, letterIndex, letterCount = 4),
+                    lines.text(indexUpdater = Right, lineIndex, letterIndex, letterCount = 4),
+                    lines.text(indexUpdater = Down + Right, lineIndex, letterIndex, letterCount = 4),
+                    lines.text(indexUpdater = Down, lineIndex, letterIndex, letterCount = 4),
+                    lines.text(indexUpdater = Down + Left, lineIndex, letterIndex, letterCount = 4),
+                    lines.text(indexUpdater = Left, lineIndex, letterIndex, letterCount = 4),
+                    lines.text(indexUpdater = Up + Left,lineIndex, letterIndex, letterCount = 4)
                 ).count { it == "XMAS" }
             }
         }
@@ -77,100 +77,69 @@ fun solvePart1() {
     println(result)
 }
 
-private fun List<String>.textUp(lineIndex: Int, letterIndex: Int, letterCount: Int = 4): String {
-    var lineIndexAddition = 0
+private fun List<String>.text(indexUpdater: IndexUpdater, lineIndex: Int, letterIndex: Int, letterCount: Int): String {
+    var count = 0
     var result = ""
-    while (abs(lineIndexAddition) < letterCount) {
-        if (lineIndex + lineIndexAddition < 0) break
-        result += this[lineIndex + lineIndexAddition--][letterIndex]
+    var point: Point? = Point(lineIndex, letterIndex)
+    while (count++ < letterCount) {
+        point!!
+        result += this[point.lineIndex][point.letterIndex]
+        point = indexUpdater.update(this, point)
+        if (point == null) {
+            break
+        }
     }
     return result
 }
 
-private fun List<String>.textUpRight(lineIndex: Int, letterIndex: Int, letterCount: Int = 4): String {
-    val width = this[0].length
-    var lineIndexAddition = 0
-    var letterIndexAddition = 0
-    var result = ""
-    while (abs(lineIndexAddition) < letterCount) {
-        if (lineIndex + lineIndexAddition < 0) break
-        if (letterIndex + letterIndexAddition >= width) break
-        result += this[lineIndex + lineIndexAddition--][letterIndex + letterIndexAddition++]
+data class Point(
+    val lineIndex: Int,
+    val letterIndex: Int
+)
+
+interface IndexUpdater {
+    fun update(lines: List<String>, point: Point): Point?
+
+    operator fun plus(updater: IndexUpdater): IndexUpdater {
+        return object : IndexUpdater {
+            override fun update(lines: List<String>, point: Point): Point? {
+                val newPoint = this@IndexUpdater.update(lines, point) ?: return null
+                return updater.update(lines, newPoint)
+            }
+        }
     }
-    return result
 }
 
-private fun List<String>.textRight(lineIndex: Int, letterIndex: Int, letterCount: Int = 4): String {
-    val width = this[0].length
-    var letterIndexAddition = 0
-    var result = ""
-    while (abs(letterIndexAddition) < letterCount) {
-        if (letterIndex + letterIndexAddition >= width) break
-        result += this[lineIndex][letterIndex + letterIndexAddition++]
-    }
-    return result
+object Up : IndexUpdater {
+    override fun update(lines: List<String>, point: Point): Point? =
+        point.copy(lineIndex = point.lineIndex - 1).takeIf { it.lineIndex >= 0 }
 }
 
-
-private fun List<String>.textDownRight(lineIndex: Int, letterIndex: Int, letterCount: Int = 4): String {
-    val width = this[0].length
-    val height = this.size
-    var lineIndexAddition = 0
-    var letterIndexAddition = 0
-    var result = ""
-    while (abs(lineIndexAddition) < letterCount) {
-        if (lineIndex + lineIndexAddition >= height) break
-        if (letterIndex + letterIndexAddition >= width) break
-        result += this[lineIndex + lineIndexAddition++][letterIndex + letterIndexAddition++]
-    }
-    return result
+object Right : IndexUpdater {
+    override fun update(lines: List<String>, point: Point): Point? =
+        point.copy(letterIndex = point.letterIndex + 1).takeIf { it.letterIndex < lines[0].length }
 }
 
-private fun List<String>.textDown(lineIndex: Int, letterIndex: Int, letterCount: Int = 4): String {
-    val height = this.size
-    var lineIndexAddition = 0
-    var result = ""
-    while (abs(lineIndexAddition) < letterCount) {
-        if (lineIndex + lineIndexAddition >= height) break
-        result += this[lineIndex + lineIndexAddition++][letterIndex]
-    }
-    return result
+object Down : IndexUpdater {
+    override fun update(lines: List<String>, point: Point): Point? =
+        point.copy(lineIndex = point.lineIndex + 1).takeIf { it.lineIndex < lines.size }
 }
 
-private fun List<String>.textDownLeft(lineIndex: Int, letterIndex: Int, letterCount: Int = 4): String {
-    val height = this.size
-    var lineIndexAddition = 0
-    var letterIndexAddition = 0
-    var result = ""
-    while (abs(lineIndexAddition) < letterCount) {
-        if (lineIndex + lineIndexAddition >= height) break
-        if (letterIndex + letterIndexAddition < 0) break
-        result += this[lineIndex + lineIndexAddition++][letterIndex + letterIndexAddition--]
-    }
-    return result
+object Left : IndexUpdater {
+    override fun update(lines: List<String>, point: Point): Point? =
+        point.copy(letterIndex = point.letterIndex - 1).takeIf { it.letterIndex >= 0 }
 }
 
-private fun List<String>.textLeft(lineIndex: Int, letterIndex: Int, letterCount: Int = 4): String {
-    var letterIndexAddition = 0
-    var result = ""
-    while (abs(letterIndexAddition) < letterCount) {
-        if (letterIndex + letterIndexAddition < 0) break
-        result += this[lineIndex][letterIndex + letterIndexAddition--]
-    }
-    return result
-}
-
-private fun List<String>.textUpLeft(lineIndex: Int, letterIndex: Int, letterCount: Int = 4): String {
-    var lineIndexAddition = 0
-    var letterIndexAddition = 0
-    var result = ""
-    while (abs(lineIndexAddition) < letterCount) {
-        if (lineIndex + lineIndexAddition < 0) break
-        if (letterIndex + letterIndexAddition < 0) break
-        result += this[lineIndex + lineIndexAddition--][letterIndex + letterIndexAddition--]
-    }
-    return result
-}
+val updaterList = listOf(
+    Up,
+    Up + Right,
+    Right,
+    Down + Right,
+    Down,
+    Down + Left,
+    Left,
+    Up + Left
+)
 
 private fun test() {
     testTextUp_regular()
@@ -201,7 +170,7 @@ private fun testTextUp_regular() {
         ****
     """.trimIndent()
 
-    val result = input.lines().textUp(4, 1)
+    val result = input.lines().text(Up, 4, 1, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -219,7 +188,7 @@ private fun testTextUp_cut_off() {
         ****
     """.trimIndent()
 
-    val result = input.lines().textUp(2, 1)
+    val result = input.lines().text(Up, 2, 1, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -239,7 +208,7 @@ private fun testTextUpRight_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().textUpRight(4, 1)
+    val result = input.lines().text(Up + Right,4, 1, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -259,7 +228,7 @@ private fun testTextUpRight_cut_off() {
         ****
     """.trimIndent()
 
-    val result = input.lines().textUpRight(4, 1)
+    val result = input.lines().text(Up + Right, 4, 1, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -279,7 +248,7 @@ private fun testTextRight_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().textRight(4, 1)
+    val result = input.lines().text(Right, 4, 1, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -299,7 +268,7 @@ private fun testTextRight_cut_off() {
         ****
     """.trimIndent()
 
-    val result = input.lines().textRight(4, 1)
+    val result = input.lines().text(Right, 4, 1, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -320,7 +289,7 @@ private fun testTextDownRight_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().textDownRight(2, 1)
+    val result = input.lines().text(Down + Right, 2, 1, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -339,7 +308,7 @@ private fun testTextDownRight_cut_off() {
         ***A**
     """.trimIndent()
 
-    val result = input.lines().textDownRight(2, 1)
+    val result = input.lines().text(Down + Right, 2, 1, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -360,7 +329,7 @@ private fun testTextDown_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().textDown(2, 1)
+    val result = input.lines().text(Down, 2, 1, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -379,7 +348,7 @@ private fun testTextDown_cut_off() {
         *A****
     """.trimIndent()
 
-    val result = input.lines().textDown(2, 1)
+    val result = input.lines().text(Down, 2, 1, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -400,7 +369,7 @@ private fun testTextDownLeft_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().textDownLeft(2, 4)
+    val result = input.lines().text(Down + Left, 2, 4, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -421,7 +390,7 @@ private fun testTextDownLeft_cut_off() {
         ****
     """.trimIndent()
 
-    val result = input.lines().textDownLeft(2, 2)
+    val result = input.lines().text(Down + Left, 2, 2, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -442,7 +411,7 @@ private fun testTextLeft_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().textLeft(2, 4)
+    val result = input.lines().text(Left, 2, 4, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -463,7 +432,7 @@ private fun testTextLeft_cut_off() {
          ****
     """.trimIndent()
 
-    val result = input.lines().textLeft(2, 2)
+    val result = input.lines().text(Left, 2, 2, 4)
 
     val expected = "XMA"
     if (expected == result) {
@@ -485,7 +454,7 @@ private fun testTextUpLeft_regular() {
         ******
     """.trimIndent()
 
-    val result = input.lines().textUpLeft(4, 4)
+    val result = input.lines().text(Up + Left, 4, 4, 4)
 
     val expected = "XMAS"
     if (expected == result) {
@@ -506,7 +475,7 @@ private fun testTextUpLeft_cut_off() {
          ****
     """.trimIndent()
 
-    val result = input.lines().textUpLeft(4, 2)
+    val result = input.lines().text(Up + Left, 4, 2, 4)
 
     val expected = "XMA"
     if (expected == result) {
