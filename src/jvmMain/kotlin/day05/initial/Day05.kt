@@ -11,7 +11,7 @@ fun main() {
     // Started: 2024-12-05 9:25
     // Finished: 2024-12-05 10:08
     // Solution: 4743
-    solvePart2()
+    solvePart2_comparatorApproach()
 }
 
 fun solvePart1() {
@@ -27,12 +27,51 @@ fun solvePart1() {
     println(sum)
 }
 
-
-fun solvePart2() {
+fun solvePart2_comparatorApproach() {
     val input = File("src/jvmMain/kotlin/day05/input/input.txt")
     val lines = input.readLines()
 
     val (rules, updates) = separateRulesAndUpdates(lines)
+
+    val comparator = Comparator<String> { left, right ->
+        if (rules.contains("$left|$right")) -1 else 0
+    }
+
+    val updateLines = updates.map { it.split(",") }
+
+    // SO EASY AND IT JUST WORKS
+    val incorrectUpdates = updateLines.map { update ->
+        val sorted = update.sortedWith(comparator)
+        update to sorted
+    }.filter { it.first != it.second }.map { it.second.joinToString(",") }
+
+    val sum = getMiddleSum(incorrectUpdates)
+
+    println(sum)
+}
+
+
+fun solvePart2() {
+    val input = File("src/jvmMain/kotlin/day05/input/input_part1_test.txt")
+    val lines = input.readLines()
+
+    val (rules, updates) = separateRulesAndUpdates(lines)
+
+    val comparator = object : Comparator<String> {
+        override fun compare(o1: String?, o2: String?): Int {
+            val contains = rules.contains("$o1|$o2")
+            return if (contains) {
+                -1
+            } else {
+                0
+            }
+        }
+    }
+
+    updates.forEach { update ->
+        val sorted = update.split(",").sortedWith(comparator)
+        println("Original: $update, sorted: $sorted")
+    }
 
     val incorrectUpdates = fixIncorrectUpdates(rules, updates)
 
