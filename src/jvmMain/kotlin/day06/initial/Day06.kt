@@ -16,7 +16,7 @@ fun main() {
 }
 
 fun solvePart2() {
-    val input = File("src/jvmMain/kotlin/day06/input/input_part1_test.txt")
+    val input = File("src/jvmMain/kotlin/day06/input/input.txt")
     var lines = input.readLines()
 
     val initialLine = lines.first { line -> line.contains('^') }
@@ -47,7 +47,53 @@ fun solvePart2() {
         }
     }
 
-    println(pointSet.distinctBy { it.first }.size)
+    val newLinesCollection = pointSet.drop(1).distinctBy { it.first }.map { it.first }
+        .map { visitedPoint ->
+            val newLines = lines.set(visitedPoint.lineIndex, lines[visitedPoint.lineIndex].toList().set(visitedPoint.letterIndex, 'O').joinToString(separator = ""))
+            println(newLines.joinToString(separator = "\n"))
+            println()
+            newLines
+        }
+
+    var count = 0
+
+    newLinesCollection.forEach { newLines ->
+        println("---------------------")
+        println("Checking new obstruction")
+        println(newLines.joinToString(separator = "\n"))
+
+        var iu: IndexUpdater = IndexUpdater.Up
+        var p: Point? = Point(initialLineIndex, initialLetterIndex)
+        var np: Point? = p
+        val s = mutableSetOf<Pair<Point, IndexUpdater>>()
+        s.add(p!! to iu)
+
+        while (true) {
+            np = iu.update(newLines, p!!)
+            println("Checking point: ${np?.lineIndex},${np?.letterIndex}, direction: $iu")
+            if (np == null) {
+                // Left the grid, finish
+                println("Left the grid, finish")
+                return@forEach
+            } else {
+                if (newLines[np.lineIndex][np.letterIndex] != '.') {
+                    iu = iu.nextOrthogonalClockwise()
+                } else {
+                    p = np
+                    if (s.contains(np to iu)) {
+                        println("LOOP FOUND, YAY")
+                        count++
+                        return@forEach
+                    }
+                    s.add(p to iu)
+                }
+            }
+        }
+    }
+
+//    println(pointSet.distinctBy { it.first }.size)
+    println("FINAL COUNT: $count")
+//    println(pointSet.distinctBy { it.first }.size)
 }
 
 
