@@ -7,16 +7,16 @@ fun main() {
     // Started: 2024-12-06 10:15
     // Finished: 2024-12-06 10:45
     // Solution: 5129
-    solvePart1()
+//    solvePart1()
 
     // Started:
     // Finished:
     // Solution:
-    //solvePart2()
+    solvePart2()
 }
 
-fun solvePart1() {
-    val input = File("src/jvmMain/kotlin/day06/input/input.txt")
+fun solvePart2() {
+    val input = File("src/jvmMain/kotlin/day06/input/input_part1_test.txt")
     var lines = input.readLines()
 
     val initialLine = lines.first { line -> line.contains('^') }
@@ -28,12 +28,12 @@ fun solvePart1() {
     var point: Point? = Point(initialLineIndex, initialLetterIndex)
     var indexUpdater: IndexUpdater = IndexUpdater.Up
 
-    val pointSet = mutableSetOf<Point>()
-    pointSet.add(point!!)
+    val pointSet = mutableSetOf<Pair<Point, IndexUpdater>>()
+    pointSet.add(point!! to indexUpdater)
 
     while (true) {
         val newPoint = indexUpdater.update(lines, point!!)
-        println("Checking point: ${point.lineIndex},${point.letterIndex}")
+        println("Checking point: ${point.lineIndex},${point.letterIndex}, direction: $indexUpdater")
         if (newPoint == null) {
             // Left the grid, finish
             break
@@ -42,21 +42,12 @@ fun solvePart1() {
                 indexUpdater = indexUpdater.nextOrthogonalClockwise()
             } else {
                 point = newPoint
-                pointSet.add(point)
+                pointSet.add(point to indexUpdater)
             }
         }
     }
 
-    println(pointSet.size)
-}
-
-fun solvePart2() {
-    val input = File("src/jvmMain/kotlin/dayNN/input/input_part1_test.txt")
-    val lines = input.readLines()
-
-    val result = "result"
-
-    println(result)
+    println(pointSet.distinctBy { it.first }.size)
 }
 
 
@@ -119,4 +110,40 @@ interface IndexUpdater {
 fun IndexUpdater.nextOrthogonalClockwise(): IndexUpdater {
     val list = IndexUpdater.orthogonal()
     return IndexUpdater.orthogonal()[(list.indexOf(this) + 1) % list.size]
+}
+
+
+fun solvePart1() {
+    val input = File("src/jvmMain/kotlin/day06/input/input.txt")
+    var lines = input.readLines()
+
+    val initialLine = lines.first { line -> line.contains('^') }
+    val initialLineIndex = lines.indexOf(initialLine)
+    val initialLetterIndex = initialLine.indexOf('^')
+
+    lines = lines.set(initialLineIndex, lines[initialLineIndex].replace('^', '.'))
+
+    var point: Point? = Point(initialLineIndex, initialLetterIndex)
+    var indexUpdater: IndexUpdater = IndexUpdater.Up
+
+    val pointSet = mutableSetOf<Point>()
+    pointSet.add(point!!)
+
+    while (true) {
+        val newPoint = indexUpdater.update(lines, point!!)
+        println("Checking point: ${point.lineIndex},${point.letterIndex}")
+        if (newPoint == null) {
+            // Left the grid, finish
+            break
+        } else {
+            if (lines[newPoint.lineIndex][newPoint.letterIndex] != '.') {
+                indexUpdater = indexUpdater.nextOrthogonalClockwise()
+            } else {
+                point = newPoint
+                pointSet.add(point)
+            }
+        }
+    }
+
+    println(pointSet.size)
 }
