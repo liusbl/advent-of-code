@@ -10,9 +10,28 @@ fun main() {
 //    solvePart1()
 
     // Started:
-    // Finished:
-    // Solution:
+    // Finished:  2024-12-07 20:41
+    // Solution: 104824810233437
+
+    println(permutate(listOf("a", "b"), 3).joinToString("\n"))
+    println(permutate(listOf("a", "b", "c"), 3).joinToString("\n"))
+
     solvePart2()
+
+//    println(rangeIndex(1, 2, 0, 21))
+}
+
+
+fun rangeIndex(number: Int, divisions: Int, from: Int, to: Int): Int {
+    val difference = to - from // 6 - 2 = 4
+    val split = difference / divisions
+    for (i in 0..divisions) {
+        println(from + split * i)
+//        if (number in ((from * i)..(from * (i + 1)))) {
+//            return i
+//        }
+    }
+    error("not found")
 }
 
 fun solvePart1() {
@@ -32,9 +51,11 @@ fun solvePart1() {
                     "+" -> {
                         acc + integer
                     }
+
                     "*" -> {
                         acc * integer
                     }
+
                     else -> error("dude")
                 }
             }
@@ -49,9 +70,8 @@ fun solvePart1() {
 }
 
 
-
 fun solvePart2() {
-    val input = File("src/jvmMain/kotlin/day07/input/input_part1_test.txt")
+    val input = File("src/jvmMain/kotlin/day07/input/input.txt")
     val lines = input.readLines()
 
     val sum = lines.sumOf { line ->
@@ -67,12 +87,15 @@ fun solvePart2() {
                     "+" -> {
                         acc + integer
                     }
+
                     "*" -> {
                         acc * integer
                     }
+
                     "|" -> {
                         "$acc$integer".toLong()
                     }
+
                     else -> error("dude")
                 }
             }
@@ -88,25 +111,25 @@ fun solvePart2() {
 
 /**
 
- + + +
- + + *
- + * +
- + * *
++ + +
++ + *
++ * +
++ * *
  * + +
  * + *
  * * +
  * * *
 
 /////////////
- + + +
- + + *
- + + |
- + * +
- + * *
- + * |
- + | +
- + | *
- + | |
++ + +
++ + *
++ + |
++ * +
++ * *
++ * |
++ | +
++ | *
++ | |
 
  * + +
  * + *
@@ -118,30 +141,30 @@ fun solvePart2() {
  * | *
  * | |
 
- | + +
- | + *
- | + |
- | * +
- | * *
- | * |
- | | +
- | | *
- | | |
+| + +
+| + *
+| + |
+| * +
+| * *
+| * |
+| | +
+| | *
+| | |
 
- ////////
+////////
 
- + +
- + *
- + |
++ +
++ *
++ |
 
  * +
  * *
  * |
 
- | +
- | *
- | |
- Lmao only works for two symbols..
+| +
+| *
+| |
+Lmao only works for two symbols..
  */
 private fun permutate(symbols: List<String>, count: Int): List<List<String>> {
     val arrayCount = symbols.size.toDouble().pow(count.toDouble()).toLong()
@@ -152,12 +175,43 @@ private fun permutate(symbols: List<String>, count: Int): List<List<String>> {
         val array = arrayOfNulls<String>(count)
         var j = 0
         while (modulo > 1) {
-            if (i % modulo >= modulo / 2) {
-                array[j++] = symbols[1]
-            } else {
-                array[j++] = symbols[0]
+            if (symbols.size == 2) {
+                if (i % modulo >= modulo / symbols.size) {
+//                    println(
+//                        "modulo: $modulo, i % modulo: ${i % modulo}, modulo / symbols.size: ${modulo / symbols.size}, " +
+//                                "something: ${(i % modulo).mod(modulo / symbols.size)}, index: 1"
+//                    )
+                    array[j++] = symbols[1]
+                } else {
+//                    println(
+//                        "modulo: $modulo, i % modulo: ${i % modulo}, modulo / symbols.size: ${modulo / symbols.size}, " +
+//                                "something: ${(i % modulo).mod(modulo / symbols.size)}, index: 0"
+//                    )
+                    array[j++] = symbols[0]
+                }
+                modulo /= symbols.size
+            } else if (symbols.size == 3) {
+                if (i % modulo >= modulo / symbols.size * 2) {
+//                    println(
+//                        "modulo: $modulo, i % modulo: ${i % modulo}, modulo / symbols.size: ${modulo / symbols.size}, " +
+//                                "something: ${(i % modulo).mod(modulo / symbols.size)}, index: 2"
+//                    )
+                    array[j++] = symbols[2]
+                } else if (i % modulo >= modulo / symbols.size) {
+//                    println(
+//                        "modulo: $modulo, i % modulo: ${i % modulo}, modulo / symbols.size: ${modulo / symbols.size}, " +
+//                                "something: ${(i % modulo).mod(modulo / symbols.size)}, index: 1"
+//                    )
+                    array[j++] = symbols[1]
+                } else {
+//                    println(
+//                        "modulo: $modulo, i % modulo: ${i % modulo}, modulo / symbols.size: ${modulo / symbols.size}, " +
+//                                "something: ${(i % modulo).mod(modulo / symbols.size)}, index: 0"
+//                    )
+                    array[j++] = symbols[0]
+                }
+                modulo /= symbols.size
             }
-            modulo /= 2
         }
         result.add(array)
     }
