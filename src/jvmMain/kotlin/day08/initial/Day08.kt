@@ -1,11 +1,12 @@
 package day08.initial
 
+import util.set
 import java.io.File
 
 fun main() {
-    // Started:
-    // Finished:
-    // Solution:
+    // Started: 2024-12-11 22:15
+    // Finished: 2024-12-11 23:30
+    // Solution: 367
     solvePart1()
 
     // Started:
@@ -15,7 +16,7 @@ fun main() {
 }
 
 fun solvePart1() {
-    val input = File("src/jvmMain/kotlin/day08/input/input_part1_test.txt")
+    val input = File("src/jvmMain/kotlin/day08/input/input.txt")
     val lines = input.readLines()
 
     val pointRows = lines.mapIndexed { lineIndex, line ->
@@ -25,27 +26,59 @@ fun solvePart1() {
     }
     val points = pointRows.flatten()
 
-    val antennaPoints = points.filter { it.letter == 'a' }
+    val antennaPoints = points.filter { it.letter != '.' }
 
-    val antennaPairs = mutableSetOf<Pair<Point,Point>>()
+    val antennaPairs = mutableSetOf<Pair<Point, Point>>()
     antennaPoints.forEach { point1 ->
         antennaPoints.forEach { point2 ->
-            if (point1 != point2 && !antennaPairs.contains(point2 to point1)) {
+            if (point1 != point2 && point1.letter == point2.letter) {
                 antennaPairs.add(point1 to point2)
             }
         }
     }
 
+    var newPointRows = List(pointRows.size) { lineIndex ->
+        List(pointRows[0].size) { letterIndex -> Point(lineIndex, letterIndex, '.') }
+    }
 
+    antennaPairs.forEach { (point1, point2) ->
+        try {
+            val lineIndexDifference = point2.lineIndex - point1.lineIndex
+            val newLineIndex = point1.lineIndex - lineIndexDifference
 
-    println(antennaPairs.joinToString("\n"))
+            val letterIndexDifference = point2.letterIndex - point1.letterIndex
+            val newLetterIndex = point1.letterIndex - letterIndexDifference
+
+            newPointRows = newPointRows.set(newLineIndex, newLetterIndex, { it.copy(letter = '#') })
+
+            println("$point1\n$point2\nnewLineIndex:$newLineIndex,newLetterIndex:$newLetterIndex")
+            println(newPointRows.toDisplayString())
+            println("--------------------")
+            println()
+        } catch (cause: Exception) {
+            println("Antinode outside grid, skipping")
+        }
+    }
+
+    println(newPointRows.toDisplayString())
+
+    println(newPointRows.flatten().filter { it.letter != '.' }.size)
 }
+
+fun List<List<Point>>.toDisplayString(): String =
+    this.joinToString(separator = "\n", transform = { row ->
+        row.joinToString(separator = "", transform = { point -> point.toDisplayString() })
+    })
 
 data class Point(
     val lineIndex: Int,
     val letterIndex: Int,
     val letter: Char
-)
+) {
+    fun toDisplayString(): String {
+        return "$letter"
+    }
+}
 
 interface IndexUpdater {
     fun update(lines: List<String>, point: Point): Point?
