@@ -38,6 +38,20 @@ fun <T> List<T>.add(index: Int, value: T): List<T> {
 
 fun <T> List<T>.set(index: Int, value: T): List<T> = toMutableList().apply { set(index, value) }
 
+fun <T> List<List<T>>.set(lineIndex: Int, valueIndex: Int, value: T): List<List<T>> {
+    return this.set(index = lineIndex, value = this[lineIndex].set(index = valueIndex, value = value))
+}
+
+fun <T> List<List<T>>.set(lineIndex: Int, valueIndex: Int, updateValue: (T) -> T): List<List<T>> =
+    this.set(
+        index = lineIndex,
+        value = this[lineIndex]
+            .set(
+                index = valueIndex,
+                value = updateValue(this[lineIndex][valueIndex])
+            )
+    )
+
 fun <T> List<T>.remove(value: T): List<T> {
     return this.toMutableList().apply { remove(value) }
 }
