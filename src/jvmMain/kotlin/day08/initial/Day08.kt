@@ -7,15 +7,15 @@ fun main() {
     // Started: 2024-12-11 22:15
     // Finished: 2024-12-11 23:30
     // Solution: 367
-    solvePart1()
+//    solvePart1()
 
-    // Started:
-    // Finished:
-    // Solution:
-    //solvePart2()
+    // Started: 2024-12-11 23:30
+    // Finished:  2024-12-11 23:36
+    // Solution: 1285
+    solvePart2()
 }
 
-fun solvePart1() {
+fun solvePart2() {
     val input = File("src/jvmMain/kotlin/day08/input/input.txt")
     val lines = input.readLines()
 
@@ -43,18 +43,22 @@ fun solvePart1() {
 
     antennaPairs.forEach { (point1, point2) ->
         try {
-            val lineIndexDifference = point2.lineIndex - point1.lineIndex
-            val newLineIndex = point1.lineIndex - lineIndexDifference
+            var multiplier = 0
+            while (true) {
+                val lineIndexDifference = point2.lineIndex - point1.lineIndex
+                val newLineIndex = point1.lineIndex - lineIndexDifference * multiplier
 
-            val letterIndexDifference = point2.letterIndex - point1.letterIndex
-            val newLetterIndex = point1.letterIndex - letterIndexDifference
+                val letterIndexDifference = point2.letterIndex - point1.letterIndex
+                val newLetterIndex = point1.letterIndex - letterIndexDifference * multiplier
 
-            newPointRows = newPointRows.set(newLineIndex, newLetterIndex, { it.copy(letter = '#') })
+                newPointRows = newPointRows.set(newLineIndex, newLetterIndex, { it.copy(letter = '#') })
 
-            println("$point1\n$point2\nnewLineIndex:$newLineIndex,newLetterIndex:$newLetterIndex")
-            println(newPointRows.toDisplayString())
-            println("--------------------")
-            println()
+                println("$point1\n$point2\nnewLineIndex:$newLineIndex,newLetterIndex:$newLetterIndex")
+                println(newPointRows.toDisplayString())
+                println("--------------------")
+                println()
+                multiplier++
+            }
         } catch (cause: Exception) {
             println("Antinode outside grid, skipping")
         }
@@ -136,11 +140,52 @@ fun IndexUpdater.nextOrthogonalClockwise(): IndexUpdater {
     return IndexUpdater.orthogonal()[(list.indexOf(this) + 1) % list.size]
 }
 
-fun solvePart2() {
-    val input = File("src/jvmMain/kotlin/day08/input/input_part1_test.txt")
+fun solvePart1() {
+    val input = File("src/jvmMain/kotlin/day08/input/input.txt")
     val lines = input.readLines()
 
-    val result = "result"
+    val pointRows = lines.mapIndexed { lineIndex, line ->
+        line.mapIndexed { letterIndex, letter ->
+            Point(lineIndex, letterIndex, letter)
+        }
+    }
+    val points = pointRows.flatten()
 
-    println(result)
+    val antennaPoints = points.filter { it.letter != '.' }
+
+    val antennaPairs = mutableSetOf<Pair<Point, Point>>()
+    antennaPoints.forEach { point1 ->
+        antennaPoints.forEach { point2 ->
+            if (point1 != point2 && point1.letter == point2.letter) {
+                antennaPairs.add(point1 to point2)
+            }
+        }
+    }
+
+    var newPointRows = List(pointRows.size) { lineIndex ->
+        List(pointRows[0].size) { letterIndex -> Point(lineIndex, letterIndex, '.') }
+    }
+
+    antennaPairs.forEach { (point1, point2) ->
+        try {
+            val lineIndexDifference = point2.lineIndex - point1.lineIndex
+            val newLineIndex = point1.lineIndex - lineIndexDifference
+
+            val letterIndexDifference = point2.letterIndex - point1.letterIndex
+            val newLetterIndex = point1.letterIndex - letterIndexDifference
+
+            newPointRows = newPointRows.set(newLineIndex, newLetterIndex, { it.copy(letter = '#') })
+
+            println("$point1\n$point2\nnewLineIndex:$newLineIndex,newLetterIndex:$newLetterIndex")
+            println(newPointRows.toDisplayString())
+            println("--------------------")
+            println()
+        } catch (cause: Exception) {
+            println("Antinode outside grid, skipping")
+        }
+    }
+
+    println(newPointRows.toDisplayString())
+
+    println(newPointRows.flatten().filter { it.letter != '.' }.size)
 }
