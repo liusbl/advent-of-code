@@ -59,3 +59,9 @@ fun <T> List<T>.remove(value: T): List<T> {
 fun <T> List<T>.removeAt(index: Int): List<T> {
     return this.toMutableList().apply { removeAt(index) }
 }
+
+fun <T> MutableList<T>.setRange(startIndex: Int, list: List<T>) {
+    for (index in startIndex until (startIndex + list.size)) {
+        this[index] = list[index - startIndex]
+    }
+}
