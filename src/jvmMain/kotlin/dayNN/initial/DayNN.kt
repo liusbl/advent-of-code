@@ -24,7 +24,7 @@ fun solvePart1() {
 }
 
 fun solvePart2() {
-    val input = File("src/jvmMain/kotlin/dayNN/input/input_part1_test.txt")
+    val input = File("src/jvmMain/kotlin/dayNN/input/input_part2_test.txt")
     val lines = input.readLines()
 
     val result = "result"

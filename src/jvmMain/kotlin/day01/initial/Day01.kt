@@ -1,11 +1,11 @@
-package _2024.day01
+package day01.initial
 
 import java.io.File
 
 fun main() {
     // Started: 2025-12-01 11:00
-    // Finished:
-    // Solution:
+    // Finished: 2025-12-01 11:06
+    // Solution: 1097
     solvePart1()
 
     // Started:
@@ -15,16 +15,34 @@ fun main() {
 }
 
 fun solvePart1() {
-    val input = File("src/jvmMain/kotlin/dayNN/input/input_part1_test.txt")
+    val input = File("src/jvmMain/kotlin/day01/input/input.txt")
     val lines = input.readLines()
 
-    val result = "result"
+    var sum = 10000050
+
+    var code = 0
+
+    lines.forEach {
+        if (it.startsWith("L")) {
+            sum += it.drop(1).toInt()
+        } else {
+            sum -= it.drop(1).toInt()
+        }
+
+        println(sum)
+
+        if (sum.toString().takeLast(2) == "00") {
+            code++
+        }
+    }
+
+    val result = code
 
     println(result)
 }
 
 fun solvePart2() {
-    val input = File("src/jvmMain/kotlin/dayNN/input/input_part1_test.txt")
+    val input = File("src/jvmMain/kotlin/day02/input/input_part2_test.txt")
     val lines = input.readLines()
 
     val result = "result"
