@@ -1,9 +1,9 @@
-package _2024.day16.initial
+package _2024.day01
 
 import java.io.File
 
 fun main() {
-    // Started:
+    // Started: 2025-12-01 11:00
     // Finished:
     // Solution:
     solvePart1()
@@ -15,7 +15,7 @@ fun main() {
 }
 
 fun solvePart1() {
-    val input = File("src/jvmMain/kotlin/day16/input/input_part1_test.txt")
+    val input = File("src/jvmMain/kotlin/dayNN/input/input_part1_test.txt")
     val lines = input.readLines()
 
     val result = "result"
@@ -24,7 +24,7 @@ fun solvePart1() {
 }
 
 fun solvePart2() {
-    val input = File("src/jvmMain/kotlin/day16/input/input_part1_test.txt")
+    val input = File("src/jvmMain/kotlin/dayNN/input/input_part1_test.txt")
     val lines = input.readLines()
 
     val result = "result"

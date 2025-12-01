@@ -1,4 +1,4 @@
-package day07.initial
+package _2024.day07.initial
 
 import java.io.File
 import kotlin.math.pow

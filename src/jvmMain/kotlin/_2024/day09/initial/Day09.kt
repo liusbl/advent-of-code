@@ -1,4 +1,4 @@
-package day09.initial
+package _2024.day09.initial
 
 import util.setRange
 import java.io.File

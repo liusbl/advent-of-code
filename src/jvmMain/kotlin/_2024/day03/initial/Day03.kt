@@ -1,4 +1,4 @@
-package day03.initial
+package _2024.day03.initial
 
 import java.io.File
 

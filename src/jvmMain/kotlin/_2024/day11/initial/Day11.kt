@@ -1,4 +1,4 @@
-package day11.initial
+package _2024.day11.initial
 
 import java.math.BigInteger
 

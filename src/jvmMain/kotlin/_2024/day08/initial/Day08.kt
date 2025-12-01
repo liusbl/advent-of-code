@@ -1,4 +1,4 @@
-package day08.initial
+package _2024.day08.initial
 
 import util.set
 import java.io.File

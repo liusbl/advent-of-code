@@ -1,4 +1,4 @@
-package day02.initial
+package _2024.day02.initial
 
 import util.add
 import util.removeAt
